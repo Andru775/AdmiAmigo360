@@ -1,0 +1,21 @@
+{
+  "name": "admiamigo360",
+  "version": "0.1.0",
+  "description": "Plataforma digital integral para la gestión de propiedades horizontales",
+  "private": true,
+  "author": "Admiamigo 360 Team",
+  "license": "PROPRIETARY",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build --workspace=frontend && npm run build --workspace=backend",
+    "start": "npm start --workspace=backend",
+    "test": "npm test --workspace=frontend && npm test --workspace=backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
