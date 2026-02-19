@@ -1,0 +1,40 @@
+# Dependencias
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Ambiente
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compilados
+*.compiled.js
+dist/
+build/
+.next/
+out/
+
+# Tests
+coverage/
+.nyc_output/
+
+# Otros
+*.log
+.cache/
+.temp/
