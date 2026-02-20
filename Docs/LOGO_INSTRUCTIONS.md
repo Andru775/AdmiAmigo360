@@ -4,7 +4,7 @@
 
 ### Opción 1: Reemplazar el archivo SVG (Recomendado)
 1. Guarda tu logo original como `logo.png` en la carpeta `/public`
-2. Actualiza las referencias en `index.html` de `logo.svg` a `logo.png`:
+2. Actualiza las referencias en `index.html` de `logo_pro-photoroom.png` a `logo.png`:
    - Navbar: línea ~11
    - Hero: línea ~40  
    - Footer: línea ~105
@@ -16,7 +16,7 @@ Si prefieres mantener el SVG:
    - CloudConvert: https://cloudconvert.com/
    - Adobe Express: https://www.adobe.com/express/
 
-2. Reemplaza el contenido de `public/logo.svg` con tu SVG
+2. Reemplaza el contenido de `public/logo_pro-photoroom.png` con tu SVG
 
 ### Archivos Donde Aparece el Logo:
 - ✅ **Navbar** (esquina superior izquierda)

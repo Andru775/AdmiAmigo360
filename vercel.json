@@ -1,6 +1,8 @@
 {
   "buildCommand": "echo 'No build required for static site'",
-  "outputDirectory": ".",
-  "public": false,
-  "regions": ["iad1"]
+  "outputDirectory": "Landing page",
+  "public": true,
+  "regions": [
+    "iad1"
+  ]
 }
