@@ -67,6 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const Renderers = {
         dashboard: () => {
             const efficiency = State.automationActive ? '98.5%' : '72.1%';
+            const bars = [40, 70, 55, 90, 65, 85, 95];
+            const barHtml = bars.map((h, i) => `<div class="chart-bar" style="height: ${h}%" data-label="Día ${i + 1}"></div>`).join('');
+
             simContent.innerHTML = `
                 <div class="dash-card-grid">
                     <div class="dash-card">
@@ -82,8 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="value">${State.clients.length}</div>
                     </div>
                 </div>
-                <div style="background: rgba(255,255,255,0.02); height: 180px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.9rem;">
-                    [ Gráfico de actividad 24/7 activo ]
+                <div style="background: rgba(255,255,255,0.02); height: 180px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.1); position: relative; overflow: hidden; padding-bottom: 25px;">
+                    <div class="chart-container">
+                        ${barHtml}
+                    </div>
                 </div>
             `;
             animateNumber(document.getElementById('count-income'), State.income);
