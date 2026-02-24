@@ -1,64 +1,107 @@
-// Smooth scrolling para los links de navegación
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+/**
+ * AdmiAmigo 360 - Commercial Interactive JS
+ * Driven by conversion and user experience
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Navbar visual feedback
+    const navbar = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 40) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
         }
     });
-});
 
-// Animación de aparición al hacer scroll
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
-        }
-    });
-}, observerOptions);
-
-// Observar elementos
-document.querySelectorAll('.feature-card, .module, .value, .pricing-card').forEach(el => {
-    observer.observe(el);
-});
-
-// Agregar estilos de animación
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// Demo button functionality
-document.querySelectorAll('.btn-primary, .btn-secondary').forEach(button => {
-    button.addEventListener('click', function() {
-        if (this.textContent.includes('Demostración') || this.textContent.includes('Contratar') || this.textContent.includes('Contactar')) {
-            const contactSection = document.getElementById('contacto');
-            if (contactSection) {
-                contactSection.scrollIntoView({ behavior: 'smooth' });
+    // Reveal elements on scroll
+    const revealElements = () => {
+        const reveals = document.querySelectorAll('.reveal');
+        reveals.forEach(el => {
+            const windowHeight = window.innerHeight;
+            const elementTop = el.getBoundingClientRect().top;
+            const elementVisible = 100;
+            if (elementTop < windowHeight - elementVisible) {
+                el.classList.add('active');
             }
-        }
-    });
-});
+        });
+    };
+    window.addEventListener('scroll', revealElements);
+    revealElements();
 
-// Mobile menu toggle (si se agrega en el futuro)
-console.log('AdmiAmigo360 - Plataforma de Gestión para Propiedades Horizontales');
-console.log('Inicializada correctamente');
+    // Interactive Experience Tabs
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.getAttribute('data-tab');
+
+            // UI Update
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+
+            btn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // Hero Mockup Parallax Effect
+    const heroMockup = document.querySelector('.mockup-main');
+    if (heroMockup) {
+        window.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 50;
+            const y = (window.innerHeight / 2 - e.pageY) / 50;
+            heroMockup.style.transform = `perspective(1000px) rotateY(${x - 8}deg) rotateX(${y + 4}deg)`;
+        });
+    }
+
+    // Smooth scroll for anchors
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+
+            const target = document.querySelector(targetId);
+            if (target) {
+                window.scrollTo({
+                    top: target.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Simple performance counter animation
+    const animateCounters = () => {
+        const counters = document.querySelectorAll('.counter');
+        counters.forEach(counter => {
+            const target = +counter.getAttribute('data-target');
+            const speed = 200;
+            const updateCount = () => {
+                const count = +counter.innerText;
+                const inc = target / speed;
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + inc);
+                    setTimeout(updateCount, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCount();
+        });
+    };
+
+    // Trigger counters when benefits section is revealed
+    const benefitsSection = document.querySelector('.benefits');
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+            animateCounters();
+            observer.disconnect();
+        }
+    }, { threshold: 0.5 });
+
+    if (benefitsSection) observer.observe(benefitsSection);
+});

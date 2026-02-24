@@ -4,229 +4,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdmiAmigo360 - Plataforma de Gestión para Propiedades Horizontales</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>AdmiAmigo 360 | Administra como una Empresa, no como un Chat de WhatsApp</title>
+    <meta name="description"
+        content="El sistema operativo definitivo para la administración de propiedad horizontal. Recupera el control, centraliza pagos y automatiza solicitudes con IA.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="container navbar-container">
-            <div class="navbar-brand">
-                <img src="public/logo_pro-photoroom.png" alt="AdmiAmigo360" class="navbar-logo">
-                <h1>AdmiAmigo360</h1>
-            </div>
-            <ul class="navbar-menu">
-                <li><a href="#inicio">Inicio</a></li>
-                <li><a href="#caracteristicas">Características</a></li>
-                <li><a href="#modulos">Módulos</a></li>
-                <li><a href="#precios">Precios</a></li>
-                <li><a href="#contacto">Contacto</a></li>
-            </ul>
-        </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <section id="inicio" class="hero">
-        <div class="container hero-content">
-            <div class="hero-text">
-                <h2>Transforma la Gestión de tu Propiedad Horizontal</h2>
-                <p>AdmiAmigo360: La plataforma digital integral que moderniza y optimiza la administración de
-                    propiedades horizontales con IA integrada</p>
-                <button class="btn btn-primary">Solicita Demostración</button>
-            </div>
-            <div class="hero-image">
-                <img src="public/logo_pro-photoroom.png" alt="AdmiAmigo360 Logo" class="hero-logo">
+    <!-- Header Navigation -->
+    <header class="navbar">
+        <div class="container nav-content">
+            <a href="#" class="logo-link">
+                <img src="public/logo_pro-photoroom.png" alt="AdmiAmigo 360">
+                <span>AdmiAmigo 360</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#experiencia">Cómo funciona</a>
+                <a href="#beneficios">Beneficios</a>
+                <a href="#precios">Precios</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="#contacto" class="btn btn-primary">Solicitar Demo</a>
             </div>
         </div>
-    </section>
+    </header>
 
-    <!-- Características Principales -->
-    <section id="caracteristicas" class="features">
-        <div class="container">
-            <h3>Problemas que Resolvemos</h3>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <i class="fas fa-envelope"></i>
-                    <h4>Comunicación Centralizada</h4>
-                    <p>Gestiona todas las solicitudes de copropietarios en un único canal 24/7 con respuestas
-                        automáticas impulsadas por IA</p>
+    <main>
+        <!-- Hero: Hook + Pain -->
+        <section class="hero">
+            <div class="container hero-layout">
+                <div class="hero-text">
+                    <span class="badge">Nuevo Estándar en Administración</span>
+                    <h1>Administrar propiedad horizontal <span>no debería ser un caos</span></h1>
+                    <p>Deja de perder horas respondiendo los mismos mensajes por WhatsApp. Recupera el control con el
+                        sistema operativo que tu administración merece.</p>
+                    <div class="hero-actions">
+                        <a href="#contacto" class="btn btn-primary">Empezar a Escalar</a>
+                        <a href="#experiencia" class="btn btn-outline">Ver Experiencia</a>
+                    </div>
+                    <div class="proof">
+                        <i class="fas fa-check-circle"></i>
+                        <span>+50 administradores ya están optimizando su operación</span>
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <i class="fas fa-chart-pie"></i>
-                    <h4>Control Presupuestal</h4>
-                    <p>Transparencia total en tiempo real sobre ingresos, egresos y ejecución presupuestal</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-money-bill"></i>
-                    <h4>Pagos Digitales</h4>
-                    <p>Pasarelas de pago certificadas para cuotas de administración y reservas de zonas comunes</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-calendar"></i>
-                    <h4>Reservas Automáticas</h4>
-                    <p>Calendario digital interactivo para gestionar disponibilidad y reservas de espacios comunes</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-users"></i>
-                    <h4>Asambleas Digitales</h4>
-                    <p>Convocatorias automatizadas, votaciones en línea y generación de actas</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-handshake"></i>
-                    <h4>Economía Colaborativa</h4>
-                    <p>Marketplace seguro de proveedores locales verificados y de confianza</p>
+                <div class="hero-visual">
+                    <div class="mockup-main">
+                        <div class="mockup-inner">
+                            <img src="public/logo_pro-photoroom.png" alt="AdmiAmigo 360 Logo"
+                                style="width: 80%; max-width: 300px; height: auto;">
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Módulos -->
-    <section id="modulos" class="modules">
-        <div class="container">
-            <h3>Nuestros Módulos</h3>
-            <div class="modules-grid">
-                <div class="module">
-                    <h4>Módulo Integrador de Solicitudes</h4>
-                    <p>Chatbot con IA que centraliza PQR, clasifica solicitudes automáticamente y sugiere soluciones
-                        basadas en conocimiento normativo</p>
+        <!-- Pain: Realidad Actual -->
+        <section class="pain reveal">
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #EF4444;">Tu Realidad
+                        Actual</span>
+                    <h2>Si estás administrando así, estás perdiendo tiempo y dinero</h2>
+                    <p>Las herramientas genéricas no fueron creadas para la complejidad de una copropiedad. El desorden
+                        cuesta caro.</p>
                 </div>
-                <div class="module">
-                    <h4>Gestión Financiera</h4>
-                    <p>Dashboard en tiempo real de ingresos y egresos, reportería para contabilidad y revisoría fiscal
-                    </p>
-                </div>
-                <div class="module">
-                    <h4>Pasarela de Pagos</h4>
-                    <p>Integración de sistemas de pago certificados y seguros para recaudo eficiente</p>
-                </div>
-                <div class="module">
-                    <h4>Agenda de Espacios</h4>
-                    <p>Gestión digital de reservas con validación automática de disponibilidad</p>
-                </div>
-                <div class="module">
-                    <h4>Asambleas y Juntas</h4>
-                    <p>Convocatorias digitales, votaciones en línea, validación de quórum automática y actas digitales
-                    </p>
-                </div>
-                <div class="module">
-                    <h4>Economía Colaborativa</h4>
-                    <p>Plataforma verificada de proveedores de servicios y bienes de calidad con calificaciones</p>
+                <div class="pain-grid">
+                    <div class="pain-card">
+                        <i class="fab fa-whatsapp"></i>
+                        <h4>WhatsApp Desbordado</h4>
+                        <p>Solicitudes mezcladas con mensajes personales. Residentes sintiéndose ignorados.</p>
+                    </div>
+                    <div class="pain-card">
+                        <i class="far fa-file-excel"></i>
+                        <h4>Excel Desactualizado</h4>
+                        <p>Información financiera fragmentada. Errores que generan desconfianza en el consejo.</p>
+                    </div>
+                    <div class="pain-card">
+                        <i class="fas fa-user-shield"></i>
+                        <h4>Falta de Control</h4>
+                        <p>No sabes quién pagó, quién reservó o qué proveedor está trabajando, hasta que es tarde.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Valores -->
-    <section class="values">
-        <div class="container">
-            <h3>Nuestros Valores</h3>
-            <div class="values-grid">
-                <div class="value">
-                    <h4>Eficiencia</h4>
-                    <p>Centralizar procesos para reducir tiempos y costos operativos</p>
+        <!-- Transition Insight -->
+        <section class="insight reveal">
+            <div class="container">
+                <p class="insight-text">"No necesitas trabajar más horas. Necesitas un sistema que trabaje por ti."</p>
+            </div>
+        </section>
+
+        <!-- Solution: Experience Interactive -->
+        <section class="experience reveal" id="experiencia">
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge">La Experiencia 360</span>
+                    <h2>Así se siente administrar con AdmiAmigo</h2>
                 </div>
-                <div class="value">
-                    <h4>Transparencia</h4>
-                    <p>Acceso claro a información financiera, operativa y normativa</p>
-                </div>
-                <div class="value">
-                    <h4>Innovación</h4>
-                    <p>Automatización con tecnología e inteligencia artificial de última generación</p>
-                </div>
-                <div class="value">
-                    <h4>Colaboración</h4>
-                    <p>Fortalecer redes de apoyo comunitario y servicios confiables</p>
-                </div>
-                <div class="value">
-                    <h4>Responsabilidad</h4>
-                    <p>Promover convivencia respetuosa y administrar recursos con ética</p>
+
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" data-tab="solicitudes">Solicitudes</button>
+                        <button class="tab-btn" data-tab="pagos">Pagos</button>
+                        <button class="tab-btn" data-tab="reservas">Reservas</button>
+                        <button class="tab-btn" data-tab="asambleas">Asambleas</button>
+                    </div>
+
+                    <div class="tab-content active" id="solicitudes">
+                        <div class="exp-text">
+                            <h3>Gestión de Solicitudes con IA</h3>
+                            <div class="exp-row">
+                                <label>Antes</label>
+                                <p>Teléfono sonando todo el día y correos que se pierden.</p>
+                            </div>
+                            <div class="exp-row">
+                                <label>Con AdmiAmigo 360</label>
+                                <p>Nuestra IA clasifica y responde automáticamente el 70% de las dudas normativas y
+                                    frecuentes.</p>
+                            </div>
+                            <div class="exp-row">
+                                <label>Resultado</label>
+                                <p><strong>Tranquilidad.</strong> Solo atiendes lo realmente urgente.</p>
+                            </div>
+                        </div>
+                        <div class="exp-viz">
+                            <i class="fas fa-robot" style="font-size: 8rem; color: var(--brand);"></i>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="pagos">
+                        <div class="exp-text">
+                            <h3>Control Financiero Real</h3>
+                            <div class="exp-row">
+                                <label>Antes</label>
+                                <p>Conciliaciones bancarias manuales que tardan días.</p>
+                            </div>
+                            <div class="exp-row">
+                                <label>Con AdmiAmigo 360</label>
+                                <p>Pasarela de pagos integrada que actualiza el estado de cuenta del residente al
+                                    instante.</p>
+                            </div>
+                            <div class="exp-row">
+                                <label>Resultado</label>
+                                <p><strong>Transparencia.</strong> El consejo ve la ejecución presupuestal en tiempo
+                                    real.</p>
+                            </div>
+                        </div>
+                        <div class="exp-viz">
+                            <i class="fas fa-wallet" style="font-size: 8rem; color: #10B981;"></i>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="reservas">
+                        <div class="exp-text">
+                            <h3>Reservas Autónomas</h3>
+                            <div class="exp-row">
+                                <label>Antes</label>
+                                <p>Discusiones por quién reservó el salón social primero.</p>
+                            </div>
+                            <div class="exp-row">
+                                <label>Con AdmiAmigo 360</label>
+                                <p>Calendario inteligente donde el residente reserva y paga sin intervención humana.</p>
+                            </div>
+                            <div class="exp-row">
+                                <label>Resultado</label>
+                                <p><strong>Cero Conflictos.</strong> Reglas claras y disponibilidad visible para todos.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="exp-viz">
+                            <i class="fas fa-calendar-check" style="font-size: 8rem; color: #F59E0B;"></i>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="asambleas">
+                        <div class="exp-text">
+                            <h3>Asambleas Digitales</h3>
+                            <div class="exp-row">
+                                <label>Antes</label>
+                                <p>Horas contando votos y lidiando con falta de quórum.</p>
+                            </div>
+                            <div class="exp-row">
+                                <label>Con AdmiAmigo 360</label>
+                                <p>Votaciones seguras desde el celular y actas generadas automáticamente al finalizar.
+                                </p>
+                            </div>
+                            <div class="exp-row">
+                                <label>Resultado</label>
+                                <p><strong>Agilidad.</strong> Decisiones válidas y legales en la mitad del tiempo.</p>
+                            </div>
+                        </div>
+                        <div class="exp-viz">
+                            <i class="fas fa-users-viewfinder" style="font-size: 8rem; color: #8B5CF6;"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Precios -->
-    <section id="precios" class="pricing">
-        <div class="container">
-            <h3>Planes de Suscripción</h3>
-            <p class="pricing-subtitle">Suscripción mensual escalable según número de unidades residenciales</p>
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <h4>Básico</h4>
-                    <p class="price">Desde $500K</p>
-                    <ul>
-                        <li>Módulo de solicitudes</li>
-                        <li>Tablero financiero básico</li>
-                        <li>Gestor de asambleas</li>
+        <!-- Benefits: Concrete Results -->
+        <section class="benefits reveal" id="beneficios">
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge">Impacto Operativo</span>
+                    <h2>Resultados, no promesas</h2>
+                </div>
+                <div class="benefits-list">
+                    <div class="benefit-item">
+                        <i class="fas fa-bolt"></i>
+                        <h4>Responde en minutos</h4>
+                        <p>Reduce el tiempo de atención de solicitudes en un 60% gracias a la automatización.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-shield-heart"></i>
+                        <h4>Evita discusiones</h4>
+                        <p>Elimina el 90% de los roces por reservas y comunicaciones mal gestionadas.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-eye"></i>
+                        <h4>Control sin archivos</h4>
+                        <p>Ten el pulso financiero de la copropiedad sin abrir una sola hoja de cálculo.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Differentiator -->
+        <section class="reveal" style="text-align: center; background: var(--bg-light);">
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge">Nuestro ADN</span>
+                    <h2>No somos otro software contable</h2>
+                    <p>No somos solo un sitio de reservas ni una app de comunicación. Somos el <strong>sistema
+                            operativo</strong> que articula residentes, consejo y administración en un solo lugar.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model: Pricing -->
+        <section class="pricing reveal" id="precios">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Un modelo simple y justo</h2>
+                    <p>SaaS escalable. Sin costos ocultos. Pagas por el tamaño de tu comunidad.</p>
+                </div>
+                <div class="pricing-wrap">
+                    <h3>Paga por Unidad</h3>
+                    <p>Costo mensual fijo por unidad residencial administrada.</p>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Todos los módulos incluidos</li>
+                        <li><i class="fas fa-check"></i> Chatbot IA activado 24/7</li>
+                        <li><i class="fas fa-check"></i> Soporte técnico prioritario</li>
+                        <li><i class="fas fa-check"></i> Actualizaciones automáticas</li>
                     </ul>
-                    <button class="btn btn-secondary">Contratar</button>
-                </div>
-                <div class="pricing-card featured">
-                    <h4>Profesional</h4>
-                    <p class="price">Desde $1.5M</p>
-                    <ul>
-                        <li>Todos los módulos básicos</li>
-                        <li>Pasarela de pagos</li>
-                        <li>Control presupuestal avanzado</li>
-                        <li>Economía colaborativa</li>
-                    </ul>
-                    <button class="btn btn-primary">Contratar</button>
-                </div>
-                <div class="pricing-card">
-                    <h4>Premium</h4>
-                    <p class="price">Contactar</p>
-                    <ul>
-                        <li>Todos los módulos</li>
-                        <li>Reportes y analítica avanzada</li>
-                        <li>Soporte prioritario 24/7</li>
-                        <li>Integraciones personalizadas</li>
-                    </ul>
-                    <button class="btn btn-secondary">Contactar</button>
+                    <a href="#contacto" class="btn btn-primary" style="width: 100%;">Solicitar Cotización</a>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Contacto -->
-    <section id="contacto" class="contact">
-        <div class="container">
-            <h3>¿Listo para transformar tu administración?</h3>
-            <p>Contacta con nosotros para conocer cómo AdmiAmigo360 puede mejorar tu gestión</p>
-            <div class="contact-info">
-                <div class="info-item">
-                    <i class="fas fa-envelope"></i>
-                    <p>info@admiamigo360.com</p>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-phone"></i>
-                    <p>+57 (1) 2345-6789</p>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <p>Bogotá, Colombia - Suba</p>
-                </div>
+        <!-- CTA Final -->
+        <section class="cta-final reveal" id="contacto">
+            <div class="container">
+                <h2>¿Seguirás administrando como hace 10 años o empiezas a hacerlo bien hoy?</h2>
+                <a href="#" class="btn btn-primary"
+                    style="background: var(--white); color: var(--brand); font-size: 1.25rem; padding: 20px 40px;">Solicitar
+                    Demo Especializada</a>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <img src="public/logo_pro-photoroom.png" alt="AdmiAmigo360" class="footer-logo">
-                    <h3>AdmiAmigo360</h3>
-                </div>
-                <div class="footer-info">
-                    <p>&copy; 2026 AdmiAmigo360. Todos los derechos reservados.</p>
-                    <p>Transformando la administración de propiedades horizontales en Colombia</p>
+            <div class="footer-top">
+                <a href="#" class="logo-link">
+                    <img src="public/logo_pro-photoroom.png" alt="AdmiAmigo 360">
+                    <span>AdmiAmigo 360</span>
+                </a>
+                <div class="social">
+                    <a href="#" style="margin-left: 1.5rem;"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" style="margin-left: 1.5rem;"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
+            <p>&copy; 2026 AdmiAmigo 360. El sistema operativo para Propiedad Horizontal. Bogotá, Colombia.</p>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="js/main.js"></script>
 </body>
 
