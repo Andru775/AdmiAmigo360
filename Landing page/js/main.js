@@ -1,137 +1,213 @@
 /**
- * AdmiAmigo 360 - Interactive Logic Core
- * Handles dashboard simulation, animations, and conversion flows
+ * AdmiAmigo 360 - The Product Simulation Core
+ * Advanced State Management & Interaction Engine
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. Dashboard Interactive Experience ---
-    const menuItems = document.querySelectorAll('.dash-menu-item');
-    const dashBody = document.querySelector('.dash-main-body');
-    const dashTitle = document.querySelector('.dash-main h2');
+    // --- 1. Dashboard State Management ---
+    const State = {
+        clients: JSON.parse(localStorage.getItem('ad360_clients')) || [
+            { id: 1, name: "Carlos Ruiz", status: "Cerrado", date: "2024-02-20" },
+            { id: 2, name: "Maria Delgado", status: "Nuevo", date: "2024-02-24" }
+        ],
+        automationActive: localStorage.getItem('ad360_automation') === 'true',
+        currentTab: 'dashboard',
+        income: 12450000,
+        activeToasts: 0
+    };
 
-    const dashData = {
-        resumen: {
-            title: "Resultados en Tiempo Real",
-            html: `
-                <div class="dash-grid">
+    const saveState = () => {
+        localStorage.setItem('ad360_clients', JSON.stringify(State.clients));
+        localStorage.setItem('ad360_automation', State.automationActive);
+    };
+
+    // --- 2. DOM Selectors ---
+    const simContent = document.getElementById('sim-content');
+    const simTitle = document.getElementById('sim-title');
+    const simFeed = document.getElementById('sim-feed');
+    const menuItems = document.querySelectorAll('.dash-menu-item');
+    const modal = document.getElementById('sim-modal-overlay');
+    const toastContainer = document.getElementById('toast-container');
+
+    // --- 3. UI Helpers ---
+    const showToast = (msg, type = 'info') => {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> <span>${msg}</span>`;
+        toastContainer.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    };
+
+    const logFeed = (msg) => {
+        const time = new Date().toLocaleTimeString();
+        simFeed.innerHTML = `> [${time}] ${msg}<br>` + simFeed.innerHTML;
+        const lines = simFeed.innerHTML.split('<br>');
+        if (lines.length > 5) simFeed.innerHTML = lines.slice(0, 5).join('<br>');
+    };
+
+    const animateNumber = (el, target) => {
+        let current = 0;
+        const step = target / 50;
+        const interval = setInterval(() => {
+            current += step;
+            if (current >= target) {
+                el.innerText = target.toLocaleString('es-CO', { style: 'currency', currency: 'COP' }).split(',')[0];
+                clearInterval(interval);
+            } else {
+                el.innerText = current.toLocaleString('es-CO', { style: 'currency', currency: 'COP' }).split(',')[0];
+            }
+        }, 20);
+    };
+
+    // --- 4. Render Logic ---
+    const Renderers = {
+        dashboard: () => {
+            const efficiency = State.automationActive ? '98.5%' : '72.1%';
+            simContent.innerHTML = `
+                <div class="dash-card-grid">
                     <div class="dash-card">
-                        <label>Ingresos Hoy</label>
-                        <div class="value">$12.4M</div>
+                        <label>Ingresos</label>
+                        <div class="value" id="count-income">$0</div>
                     </div>
                     <div class="dash-card">
                         <label>Efectividad IA</label>
-                        <div class="value" style="color: var(--success);">98.2%</div>
+                        <div class="value" style="color: ${State.automationActive ? 'var(--success)' : 'var(--brand)'}">${efficiency}</div>
                     </div>
                     <div class="dash-card">
-                        <label>Atención PQR</label>
-                        <div class="value">9 min</div>
+                        <label>Total Clientes</label>
+                        <div class="value">${State.clients.length}</div>
                     </div>
                 </div>
-                <div style="background: rgba(255,255,255,0.02); height: 200px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.9rem;">
-                    [ Simulación de gráfico de recaudo activo ]
+                <div style="background: rgba(255,255,255,0.02); height: 180px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.9rem;">
+                    [ Gráfico de actividad 24/7 activo ]
                 </div>
-            `
+            `;
+            animateNumber(document.getElementById('count-income'), State.income);
         },
-        clientes: {
-            title: "Base de Residentes",
-            html: `
+        clientes: () => {
+            let listHtml = State.clients.map(c => `
+                <tr>
+                    <td style="font-weight: 600;">${c.name}</td>
+                    <td><span class="status-badge ${c.status === 'Cerrado' ? 'status-active' : 'status-new'}">${c.status}</span></td>
+                    <td style="color: var(--text-muted); font-size: 0.8rem;">${c.date}</td>
+                </tr>
+            `).join('');
+
+            simContent.innerHTML = `
                 <div class="dash-actions">
-                    <button class="btn-dash btn-sim-action" data-action="Add">Agregar Cliente</button>
-                    <button class="btn-dash">Exportar Reporte</button>
+                    <button class="btn-dash" id="btn-add-client"><i class="fas fa-plus"></i> Agregar Cliente</button>
+                    <button class="btn-dash" style="background: rgba(255,255,255,0.05); color: white;">Exportar</button>
                 </div>
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); text-align: left;">
-                        <th style="padding: 12px;">Unidad</th>
-                        <th>Nombre</th>
-                        <th>Estado</th>
-                    </tr>
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                        <td style="padding: 12px;">Casa 102</td>
-                        <td>Carlos Rodríguez</td>
-                        <td><span style="color: var(--success);">● Al día</span></td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                        <td style="padding: 12px;">Torre 2 - 504</td>
-                        <td>Elena Martínez</td>
-                        <td><span style="color: var(--error);">● Mora</span></td>
-                    </tr>
+                <table class="data-table">
+                    ${listHtml || '<tr><td colspan="3" style="text-align:center;">No hay clientes registrados</td></tr>'}
                 </table>
-                <div id="sim-feedback" style="margin-top: 15px; color: var(--brand); font-weight: 700; height: 20px;"></div>
-            `
+            `;
+
+            document.getElementById('btn-add-client').onclick = () => modal.classList.add('active');
         },
-        ia: {
-            title: "Control de Automatización",
-            html: `
-                <div style="text-align: center; padding: 3rem;">
-                    <i class="fas fa-robot" style="font-size: 5rem; color: var(--brand); margin-bottom: 1.5rem;"></i>
-                    <h3>El Chatbot IA está resolviendo el 70% de tus dudas.</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Activa el seguidor automático para reducir la mora un 40%.</p>
-                    <button class="btn btn-primary btn-sim-action" data-action="IA" style="padding: 10px 20px; font-size: 0.9rem;">Ejecutar Automatización</button>
+        automatizacion: () => {
+            simContent.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-robot" style="font-size: 4rem; color: ${State.automationActive ? 'var(--success)' : 'var(--brand)'}; margin-bottom: 2rem;"></i>
+                    <h3>Seguimiento 24/7 Inteligente</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Activa la IA para que AdmiAmigo envíe recordatorios de pago y resuelva dudas por ti.</p>
+                    <button class="btn-dash" id="btn-toggle-auto" style="padding: 18px 40px; font-size: 1.1rem; background: ${State.automationActive ? 'var(--error)' : 'var(--brand)'}">
+                        ${State.automationActive ? 'Desactivar Sistema' : 'Activar Automatización'}
+                    </button>
                 </div>
-            `
+            `;
+
+            document.getElementById('btn-toggle-auto').onclick = () => {
+                State.automationActive = !State.automationActive;
+                saveState();
+                showToast(State.automationActive ? 'Automatización Activada' : 'Sistema Desactivado', State.automationActive ? 'success' : 'info');
+                logFeed(State.automationActive ? 'IA: Sistema de seguimiento ON' : 'IA: Sistema de seguimiento OFF');
+                Renderers.automatizacion();
+            };
+        },
+        metricas: () => {
+            simContent.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="dash-card">
+                        <label>Retención</label>
+                        <div class="value">94%</div>
+                    </div>
+                    <div class="dash-card">
+                        <label>Crecimiento</label>
+                        <div class="value" style="color: var(--success);">+12%</div>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem; padding: 2rem; background: rgba(10, 102, 194, 0.05); border-radius: 20px; border: 1px solid var(--brand-glow);">
+                    <h4 style="margin-bottom: 1rem;">Optimización Detectada</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">El sistema ha identificado que puedes ahorrar 8 horas semanales adicionales activando el módulo de facturación masiva.</p>
+                </div>
+            `;
         }
     };
 
-    menuItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const tab = item.getAttribute('data-tab');
-            const data = dashData[tab];
-
-            menuItems.forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-
-            dashTitle.style.transform = "translateY(10px)";
-            dashTitle.style.opacity = "0";
-
-            setTimeout(() => {
-                dashTitle.innerText = data.title;
-                dashBody.innerHTML = data.html;
-                dashTitle.style.transform = "translateY(0)";
-                dashTitle.style.opacity = "1";
-
-                // Re-bind buttons inside the simulation
-                bindSimButtons();
-            }, 200);
+    const switchTab = (tab) => {
+        State.currentTab = tab;
+        simTitle.innerText = tab.charAt(0).toUpperCase() + tab.slice(1);
+        menuItems.forEach(item => {
+            item.classList.toggle('active', item.getAttribute('data-tab') === tab);
         });
+        Renderers[tab]();
+    };
+
+    // --- 5. Event Listeners ---
+    menuItems.forEach(item => {
+        item.onclick = () => switchTab(item.getAttribute('data-tab'));
     });
 
-    function bindSimButtons() {
-        document.querySelectorAll('.btn-sim-action').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const action = btn.getAttribute('data-action');
-                const feedback = document.getElementById('sim-feedback');
+    document.getElementById('sim-close-modal').onclick = () => modal.classList.remove('active');
 
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+    document.getElementById('sim-save-client').onclick = () => {
+        const name = document.getElementById('sim-client-name').value;
+        const status = document.getElementById('sim-client-status').value;
 
-                setTimeout(() => {
-                    if (action === 'Add') {
-                        btn.innerHTML = 'Agregar Cliente';
-                        if (feedback) feedback.innerText = "✓ Cliente 204 agregado al registro";
-                    } else if (action === 'IA') {
-                        btn.innerHTML = '¡Automatización Exitosa!';
-                        btn.style.background = "var(--success)";
-                    }
+        if (!name) return showToast('Por favor ingresa un nombre', 'info');
 
-                    if (feedback) setTimeout(() => feedback.innerText = "", 2000);
-                }, 1000);
-            });
+        State.clients.unshift({
+            id: Date.now(),
+            name,
+            status,
+            date: new Date().toISOString().split('T')[0]
         });
-    }
 
-    // --- 2. Scroll Reveal ---
-    const reveal = () => {
-        const reveals = document.querySelectorAll('.reveal');
-        reveals.forEach(el => {
-            const windowHeight = window.innerHeight;
-            const elementTop = el.getBoundingClientRect().top;
-            if (elementTop < windowHeight - 120) el.classList.add('active');
-        });
+        saveState();
+        modal.classList.remove('active');
+        document.getElementById('sim-client-name').value = "";
+
+        showToast('Cliente guardado exitosamente', 'success');
+        logFeed(`CLIENTE: Nuevo registro -> ${name}`);
+
+        if (State.currentTab === 'clientes') Renderers.clientes();
+        else switchTab('clientes');
     };
-    window.addEventListener('scroll', reveal);
-    reveal();
 
-    // --- 3. Navbar Sticky & Floating CTA ---
+    // --- 6. Simulation Loop (Fake Activity) ---
+    setInterval(() => {
+        if (State.automationActive && Math.random() > 0.7) {
+            const msgs = [
+                "IA: Recordatorio enviado a Casa 101",
+                "IA: Pago conciliado automáticamente",
+                "IA: PQR resuelto por chatbot",
+                "SISTEMA: Backup diario completado"
+            ];
+            const msg = msgs[Math.floor(Math.random() * msgs.length)];
+            logFeed(msg);
+            showToast(msg);
+        }
+    }, 8000);
+
+    // Initial Render
+    switchTab('dashboard');
+
+    // --- 7. General Page Logic (Scroll Reveal / Header) ---
     const header = document.querySelector('.header');
     const floatCta = document.querySelector('.cta-float');
 
@@ -143,35 +219,11 @@ document.addEventListener('DOMContentLoaded', () => {
             header.classList.remove('active');
             floatCta.classList.remove('active');
         }
-    });
 
-    // --- 4. Counter Animation (Simple) ---
-    const animateCounters = () => {
-        const counters = document.querySelectorAll('.count');
-        counters.forEach(c => {
-            const target = +c.getAttribute('data-target');
-            const update = () => {
-                const current = +c.innerText;
-                const inc = target / 200;
-                if (current < target) {
-                    c.innerText = Math.ceil(current + inc);
-                    setTimeout(update, 1);
-                } else {
-                    c.innerText = target;
-                }
-            };
-            update();
+        document.querySelectorAll('.reveal').forEach(el => {
+            if (el.getBoundingClientRect().top < window.innerHeight - 100) {
+                el.classList.add('active');
+            }
         });
-    };
-
-    // Trigger counters only once
-    const metricsSection = document.querySelector('.benefits');
-    const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-            animateCounters();
-            observer.disconnect();
-        }
-    }, { threshold: 0.5 });
-
-    if (metricsSection) observer.observe(metricsSection);
+    });
 });
