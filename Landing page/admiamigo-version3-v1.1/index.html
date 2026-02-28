@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdmiAmigo 360 - Administración Inteligente</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Advanced Text Animation -->
+    <script src="https://unpkg.com/split-type"></script>
+</head>
+
+<body>
+    <!-- Top Progress Bar -->
+    <div class="progress-bar"></div>
+
+    <!-- 1) INTRO SECTION - SEPARATED (Very long for slow scroll) -->
+    <div id="intro-sequence" class="intro-sequence">
+        <div class="video-sticky-container">
+            <canvas id="bg-canvas"></canvas>
+            <div class="video-overlay" id="interactive-overlay"></div>
+
+            <div class="intro-content">
+                <h1 class="hero-title">AdmiAmigo<span style="color:var(--accent);">360</span></h1>
+                <p class="hero-subtitle">Administración inteligente para comunidades modernas.</p>
+            </div>
+
+            <!-- Initial Scroll Down Indicator -->
+            <div class="scroll-indicator">
+                <span class="scroll-text">SCROLL PARA DESCUBRIR</span>
+                <div class="line"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2) STRONGLY DIFFERENTIATED SECTIONS -->
+    <main class="content-sections">
+
+        <!-- Product Overview -->
+        <section class="content-section variant-dark" id="overview">
+            <div class="section-container center-text">
+                <span class="feature-tag">VISIÓN GLOBAL</span>
+                <h2 class="section-title">El Ecosistema Definitivo</h2>
+                <p class="section-desc">AdmiAmigo 360 no es solo un software; es una plataforma integral diseñada para
+                    dar transparencia, automatización y paz mental a las propiedades más exigentes. Todo conectado, todo
+                    en tiempo real.</p>
+            </div>
+        </section>
+
+        <!-- Intelligent Automation -->
+        <section class="content-section variant-light" id="automation">
+            <div class="section-container split-layout">
+                <div class="text-block">
+                    <span class="feature-tag">MOTOR CENTRAL</span>
+                    <h2 class="section-title">Automatización Inteligente</h2>
+                    <ul class="feature-list">
+                        <li><strong>Pagos Automáticos:</strong> Conciliación bancaria al instante con pasarelas
+                            certificadas.</li>
+                        <li><strong>Onboarding Residencial:</strong> Registro digital fluido de residentes, mascotas y
+                            vehículos.</li>
+                        <li><strong>Flujos de PQR:</strong> Resolución de quejas y reclamos con flujos de trabajo
+                            inteligentes.</li>
+                        <li><strong>Notificaciones Smart:</strong> Alertas multicanal automáticas a toda la comunidad.
+                        </li>
+                    </ul>
+                </div>
+                <div class="visual-block">
+                    <div class="glass-mockup icon-mode">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--accent)"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard & Metrics -->
+        <section class="content-section variant-dark" id="dashboard">
+            <div class="section-container split-layout reverse">
+                <div class="text-block">
+                    <span class="feature-tag">CONTROL TOTAL</span>
+                    <h2 class="section-title">Dashboard en Tiempo Real</h2>
+                    <ul class="feature-list">
+                        <li><strong>Rastreo de Ingresos:</strong> Visualiza la salud financiera al segundo.</li>
+                        <li><strong>Métricas de Ocupación:</strong> Control estricto del censo de la propiedad.</li>
+                        <li><strong>Mantenimiento:</strong> Supervisa el estado de áreas comunes en vivo.</li>
+                        <li><strong>Proyecciones:</strong> Semáforos presupuestales para evitar sobrecostos.</li>
+                    </ul>
+                </div>
+                <div class="visual-block">
+                    <div class="glass-mockup icon-mode">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--accent)"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Analytics -->
+        <section class="content-section variant-light" id="analytics">
+            <div class="section-container split-layout">
+                <div class="text-block">
+                    <span class="feature-tag">INTELIGENCIA APLICADA</span>
+                    <h2 class="section-title">Analítica Avanzada & IA Legal</h2>
+                    <ul class="feature-list">
+                        <li><strong>Chatbot Especialista:</strong> IA entrenada en la Ley 675 para responder al
+                            instante.</li>
+                        <li><strong>Predicciones:</strong> Visualización de tendencias de cartera y gastos.</li>
+                        <li><strong>Comparativas:</strong> Analiza el rendimiento frente a periodos históricos.</li>
+                        <li><strong>Detección de Riesgos:</strong> Alertas preventivas sobre desviaciones del
+                            presupuesto.</li>
+                    </ul>
+                </div>
+                <div class="visual-block">
+                    <div class="glass-mockup stats-mode">
+                        <div class="stat">
+                            <span class="counter-wrap"><span class="counter" data-target="80">0</span>%</span>
+                            <span class="stat-label">Resolución IA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Community Experience -->
+        <section class="content-section variant-dark" id="community">
+            <div class="section-container center-text">
+                <span class="feature-tag">CONEXIÓN HUMANA</span>
+                <h2 class="section-title">Experiencia Comunitaria Smart</h2>
+
+                <div class="grid-4-col mt-5">
+                    <div class="feature-card">
+                        <h4 class="card-title">Resident App</h4>
+                        <p class="card-desc">Control total desde la palma de la mano pata cada residente.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4 class="card-title">Eventos & Zonas</h4>
+                        <p class="card-desc">Reservas automatizadas sin llamar a la portería.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4 class="card-title">Citófono Digital</h4>
+                        <p class="card-desc">Anuncios directos al celular sin hardware obsoleto.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4 class="card-title">Asambleas Virtuales</h4>
+                        <p class="card-desc">Quórum y votaciones electrónicas seguras.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security & Compliance -->
+        <section class="content-section variant-light" id="security">
+            <div class="section-container split-layout reverse">
+                <div class="text-block">
+                    <span class="feature-tag">TRANQUILIDAD BLINDADA</span>
+                    <h2 class="section-title">Seguridad & Cumplimiento</h2>
+                    <ul class="feature-list">
+                        <li><strong>Control de Acceso:</strong> Integración con sistemas de lectura biométrica o facial.
+                        </li>
+                        <li><strong>Protección de Datos:</strong> Cumplimiento estricto con la ley de Habeas Data.</li>
+                        <li><strong>Logs de Auditoría:</strong> Trazabilidad del 100% de las acciones en el sistema.
+                        </li>
+                        <li><strong>Respaldo en la Nube:</strong> Amazon Web Services garantizando 99.9% uptime.</li>
+                    </ul>
+                </div>
+                <div class="visual-block">
+                    <div class="glass-mockup icon-mode">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--accent)"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social Proof -->
+        <section class="content-section variant-dark subtle-border" id="comparison">
+            <div class="section-container center-text">
+                <h2 class="section-title small">El Salto Tecnológico</h2>
+                <p class="section-desc mb-4">La diferencia entre lo obsoleto y el estándar tecnológico.</p>
+
+                <div class="comparison-board">
+                    <div class="board-side bad">
+                        <h3>Tradicional</h3>
+                        <ul class="comparison-list">
+                            <li>✗ Carteras vencidas fuera de control</li>
+                            <li>✗ Gestión manual en Excel</li>
+                            <li>✗ Asambleas caóticas de 6 horas</li>
+                            <li>✗ Decisiones sin datos reales</li>
+                        </ul>
+                    </div>
+                    <div class="board-side good">
+                        <h3>AdmiAmigo 360</h3>
+                        <ul class="comparison-list">
+                            <li>✓ Recaudo automatizado 100%</li>
+                            <li>✓ Panel centralizado en la nube</li>
+                            <li>✓ Asambleas guiadas de 1 hora</li>
+                            <li>✓ Decisiones basadas en IA y métricas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="content-section variant-gradient" id="cta">
+            <div class="section-container center-text end-cta">
+                <h2 class="section-title large">Toma el control hoy.</h2>
+                <p class="section-desc mb-extra">Únete a la élite administrativa con la plataforma líder en tecnología.
+                </p>
+
+                <button class="btn-premium">
+                    <span class="btn-bg"></span>
+                    <span class="btn-text">Agendar Demo Privada</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+                <p class="trust-badge">SETUP EN 24 HORAS • SOPORTE PREMIUM</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
