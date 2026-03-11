@@ -2,6 +2,13 @@
 
 ## 🏢 Plataforma de Gestión Integral para Propiedades Horizontales
 
+## 🌐 App en Vivo
+
+- URL pública principal: https://admiamigo360app.vercel.app
+- Proyecto en Vercel: `web` (equipo `Mafe Leon's projects`)
+- Rama de trabajo activa: `visual-proposal-feb`
+- Nota: el enlace público se mantiene fuera de `main` hasta que tú decidas mergear.
+
 AdmiAmigo360 es una plataforma digital innovadora diseñada para transformar la administración de propiedades horizontales de vivienda urbana. Mediante la integración de inteligencia artificial, centraliza procesos, mejora la comunicación y garantiza transparencia en todas las operaciones.
 
 ### 📋 Descripción General
