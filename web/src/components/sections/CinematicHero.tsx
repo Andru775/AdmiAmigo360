@@ -9,6 +9,9 @@ import {
 } from "framer-motion";
 import { useCallback, useEffect, useRef } from "react";
 
+const HERO_FPS = 30;
+const HERO_FRAME = 1 / HERO_FPS;
+
 export default function CinematicHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -54,11 +57,11 @@ export default function CinematicHero() {
 
     v.pause();
 
-    if (Math.abs(v.currentTime - nextTime) <= 0.008) return;
+    if (Math.abs(v.currentTime - nextTime) <= HERO_FRAME * 0.25) return;
     v.currentTime = nextTime;
   }, []);
 
-  const runSmoothSeek = useCallback(() => {
+  const runScrollTick = useCallback(() => {
     if (!readyRef.current) {
       frameRef.current = null;
       return;
@@ -70,18 +73,9 @@ export default function CinematicHero() {
       return;
     }
 
-    const target = targetTimeRef.current;
-    const diff = target - v.currentTime;
-
-    if (Math.abs(diff) <= 0.004) {
-      seekVideo(target);
-      frameRef.current = null;
-      return;
-    }
-
-    const nextTime = v.currentTime + diff * 0.32;
-    seekVideo(nextTime);
-    frameRef.current = requestAnimationFrame(runSmoothSeek);
+    const target = Math.round(targetTimeRef.current * HERO_FPS) / HERO_FPS;
+    seekVideo(target);
+    frameRef.current = null;
   }, [seekVideo]);
 
   const syncToProgress = useCallback((progress: number) => {
@@ -90,9 +84,9 @@ export default function CinematicHero() {
     targetTimeRef.current = progressToTime(progress);
 
     if (frameRef.current === null) {
-      frameRef.current = requestAnimationFrame(runSmoothSeek);
+      frameRef.current = requestAnimationFrame(runScrollTick);
     }
-  }, [progressToTime, runSmoothSeek]);
+  }, [progressToTime, runScrollTick]);
 
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
     syncToProgress(progress);
@@ -184,7 +178,7 @@ export default function CinematicHero() {
         <motion.video
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover will-change-transform"
-          src="/media/hero-scrub.mp4"
+          src="/media/hero-scrub-balanced.mp4"
           muted
           playsInline
           disablePictureInPicture
