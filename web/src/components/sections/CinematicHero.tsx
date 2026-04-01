@@ -248,6 +248,12 @@ export default function CinematicHero() {
 
             <div className="mt-10 flex flex-wrap justify-center gap-3">
               <a
+                href="/app"
+                className="rounded-xl border border-cyan-200/60 bg-cyan-200/15 px-6 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-200/25"
+              >
+                Entrar al panel
+              </a>
+              <a
                 href="#como-funciona"
                 className="rounded-xl bg-cyan-200 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100"
               >
