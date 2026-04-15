@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admiamigo 360 - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#872be3",
+                        "accent-gold": "#d4af37",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#0a0b1e",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(25, 17, 33, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(135, 43, 227, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .metallic-gold-gradient {
+            background: linear-gradient(135deg, #d4af37 0%, #f9e29c 50%, #b8860b 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<div class="relative flex min-h-screen w-full flex-col items-center justify-center p-4 overflow-hidden">
+<!-- Background Accents -->
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent-gold/10 rounded-full blur-[120px]"></div>
+<div class="w-full max-w-md space-y-8 relative z-10">
+<!-- Header Section -->
+<div class="flex flex-col items-center">
+<div class="mb-6 p-4 rounded-xl bg-primary/10 border border-primary/20">
+<span class="material-symbols-outlined text-5xl text-primary" style="font-variation-settings: 'FILL' 1">shield_person</span>
+</div>
+<h2 class="text-3xl font-bold tracking-tight text-slate-100 text-center">Admiamigo <span class="text-primary">360</span></h2>
+<p class="mt-2 text-slate-400 text-center">Secure access to your fintech portal</p>
+</div>
+<!-- Login Card -->
+<div class="glass-card rounded-xl p-8 space-y-6">
+<!-- Access Type Toggle -->
+<div class="flex p-1 bg-background-dark/50 border border-slate-700 rounded-lg">
+<button class="flex-1 py-2 px-4 rounded-md bg-primary text-white text-sm font-medium transition-all">
+                        Resident
+                    </button>
+<button class="flex-1 py-2 px-4 rounded-md text-slate-400 text-sm font-medium hover:text-slate-200 transition-all">
+                        Admin
+                    </button>
+</div>
+<form class="space-y-5">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 ml-1" for="email">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xl">mail</span>
+<input class="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-slate-100 placeholder:text-slate-600 outline-none transition-all" id="email" placeholder="name@example.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center px-1">
+<label class="block text-xs font-semibold uppercase tracking-wider text-slate-400" for="password">Password</label>
+<a class="text-xs font-medium text-primary hover:text-primary/80 transition-colors" href="#">Forgot Password?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xl">lock</span>
+<input class="w-full pl-10 pr-12 py-3 bg-slate-900/50 border border-slate-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-slate-100 placeholder:text-slate-600 outline-none transition-all" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300" type="button">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
+</div>
+<!-- Login Button -->
+<button class="w-full py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 group" onclick="window.location.href='{{DATA:SCREEN:SCREEN_6}}'" type="submit">
+<span>Secure Login</span>
+<span class="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+<!-- Divider -->
+<div class="relative py-2">
+<div aria-hidden="true" class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-slate-700"></div>
+</div>
+<div class="relative flex justify-center text-xs uppercase">
+<span class="bg-slate-900/0 px-2 text-slate-500">Or continue with</span>
+</div>
+</div>
+<!-- Biometric/Social Access -->
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-slate-800/50 border border-slate-700 hover:bg-slate-800 transition-all">
+<span class="material-symbols-outlined text-accent-gold">fingerprint</span>
+<span class="text-xs font-semibold text-slate-300">Biometric</span>
+</button>
+<button class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-slate-800/50 border border-slate-700 hover:bg-slate-800 transition-all">
+<span class="material-symbols-outlined text-primary">key</span>
+<span class="text-xs font-semibold text-slate-300">SSO</span>
+</button>
+</div>
+</div>
+<!-- Footer -->
+<p class="text-center text-slate-500 text-sm">
+                Don't have an account? 
+                <a class="text-primary font-semibold hover:underline" href="#">Contact Property Admin</a>
+</p>
+</div>
+<!-- Decorative Elements -->
+<div class="fixed bottom-8 left-8 hidden lg:block">
+<div class="flex items-center gap-2 text-slate-600">
+<span class="material-symbols-outlined text-accent-gold text-sm" style="font-variation-settings: 'FILL' 1">verified_user</span>
+<span class="text-[10px] uppercase tracking-[0.2em] font-bold">Encrypted End-to-End</span>
+</div>
+</div>
+<div class="fixed bottom-8 right-8 hidden lg:block">
+<div class="flex items-center gap-4">
+<div class="h-1 w-12 bg-primary/30 rounded-full"></div>
+<div class="h-1 w-1 bg-slate-700 rounded-full"></div>
+<div class="h-1 w-1 bg-slate-700 rounded-full"></div>
+</div>
+</div>
+</div>
+</body></html>

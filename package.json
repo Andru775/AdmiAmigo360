@@ -1,0 +1,16 @@
+{
+  "name": "appadmiamigo360",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "lint": "npm --prefix web run lint",
+    "start": "npm --prefix web run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mafeleon/appAdmiamigo360.git"
+  }
+}
+

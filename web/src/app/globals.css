@@ -1,0 +1,312 @@
+@import "tailwindcss";
+
+:root {
+  --app-bg: #f4efe9;
+  --app-shell: #fdfbf8;
+  --app-shell-strong: #f7f1ea;
+  --app-surface: #f4ece3;
+  --app-surface-soft: #fbf7f2;
+  --app-card: #ffffff;
+  --app-card-border: #e8ddd2;
+  --app-primary: #4f382f;
+  --app-primary-soft: #ede3da;
+  --app-secondary: #bf9d6c;
+  --app-tertiary: #8f786c;
+  --app-text: #2f241e;
+  --app-heading: #241913;
+  --app-muted: #6f6157;
+  --app-muted-strong: #9c8c82;
+  --app-success: #567260;
+  --app-success-bg: #e6efe9;
+  --app-danger: #a15a49;
+  --app-danger-bg: #f7eae5;
+  --app-shadow: 0 10px 24px rgba(71, 51, 41, 0.05);
+}
+
+html {
+  height: 100%;
+  background: var(--app-bg);
+  scroll-behavior: auto;
+  overscroll-behavior: none;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: linear-gradient(180deg, #faf6f1 0%, #f4efe9 100%);
+  color: var(--app-heading);
+  font-family:
+    "Avenir Next",
+    "SF Pro Text",
+    "Segoe UI",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  touch-action: manipulation;
+}
+
+::selection {
+  background: rgba(79, 56, 47, 0.18);
+  color: var(--app-text);
+}
+
+input::placeholder {
+  color: rgba(124, 107, 98, 0.7);
+}
+
+.app-scroll {
+  overscroll-behavior-y: contain;
+  scroll-padding-bottom: 8rem;
+  -webkit-overflow-scrolling: touch;
+  contain: layout;
+}
+
+.app-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.app-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(141, 110, 99, 0.42);
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.app-horizontal {
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+
+.app-horizontal > * {
+  scroll-snap-align: start;
+}
+
+.app-display {
+  font-family:
+    "Avenir Next",
+    "SF Pro Display",
+    "Segoe UI",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  letter-spacing: -0.045em;
+}
+
+.app-kicker {
+  color: var(--app-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.app-glass-card {
+  background: var(--app-card) !important;
+  border-color: var(--app-card-border) !important;
+  box-shadow: var(--app-shadow) !important;
+}
+
+.app-button-primary {
+  border: 1px solid transparent;
+  background: linear-gradient(180deg, #5b4339 0%, #4f382f 100%);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(79, 56, 47, 0.12);
+}
+
+.app-button-secondary {
+  border: 1px solid var(--app-card-border);
+  background: #fff;
+  color: var(--app-heading);
+}
+
+.app-button-ghost {
+  border: 1px solid transparent;
+  background: rgba(79, 56, 47, 0.06);
+  color: var(--app-primary);
+}
+
+.app-input {
+  border: 1px solid var(--app-card-border);
+  background: #fff;
+  color: var(--app-heading);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.app-chip {
+  border: 1px solid var(--app-card-border);
+  background: #fff;
+  color: var(--app-heading);
+}
+
+.app-figure {
+  border: 1px solid rgba(191, 157, 108, 0.2);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 247, 238, 0.96));
+}
+
+.app-glass-card .text-white,
+.app-glass-card .text-slate-100,
+.app-glass-card .text-slate-200 {
+  color: var(--app-heading) !important;
+}
+
+.app-glass-card .text-slate-300,
+.app-glass-card .text-slate-400 {
+  color: var(--app-muted) !important;
+}
+
+.app-glass-card a.text-white,
+.app-glass-card button.text-white {
+  color: #fff !important;
+}
+
+.app-glass-card .text-emerald-300,
+.app-glass-card .text-emerald-400 {
+  color: var(--app-success) !important;
+}
+
+.app-glass-card .text-red-100 {
+  color: #8b3a33 !important;
+}
+
+.text-slate-100,
+.text-slate-200 {
+  color: var(--app-heading) !important;
+}
+
+.text-slate-300,
+.text-slate-400 {
+  color: var(--app-muted) !important;
+}
+
+.text-slate-500 {
+  color: var(--app-muted-strong) !important;
+}
+
+.text-emerald-300,
+.text-emerald-400 {
+  color: var(--app-success) !important;
+}
+
+.bg-emerald-500\/10 {
+  background-color: rgba(111, 135, 100, 0.18) !important;
+}
+
+.border-white\/10,
+.border-white\/8 {
+  border-color: rgba(141, 110, 99, 0.22) !important;
+}
+
+.bg-white\/5,
+.bg-white\/6,
+.bg-white\/\[0\.04\],
+.bg-white\/\[0\.05\] {
+  background-color: rgba(93, 64, 55, 0.08) !important;
+}
+
+.bg-slate-800,
+.bg-slate-800\/50 {
+  background-color: rgba(241, 231, 220, 0.96) !important;
+}
+
+.border-slate-700 {
+  border-color: rgba(141, 110, 99, 0.24) !important;
+}
+
+.bg-black\/20 {
+  background-color: rgba(93, 64, 55, 0.08) !important;
+}
+
+.bg-\[\#7A6358\],
+.bg-\[\#7E695F\] {
+  background-color: #fff !important;
+  border-color: var(--app-card-border) !important;
+  box-shadow: var(--app-shadow) !important;
+}
+
+.bg-\[\#7A6358\] .text-white,
+.bg-\[\#7E695F\] .text-white,
+.bg-\[\#7A6358\] .text-slate-200,
+.bg-\[\#7E695F\] .text-slate-200 {
+  color: var(--app-heading) !important;
+}
+
+.bg-\[\#7A6358\] .text-slate-300,
+.bg-\[\#7E695F\] .text-slate-300,
+.bg-\[\#7A6358\] .text-slate-400,
+.bg-\[\#7E695F\] .text-slate-400 {
+  color: var(--app-muted) !important;
+}
+
+.bg-\[\#41332D\],
+.bg-\[\#473730\] {
+  background-color: var(--app-surface-soft) !important;
+  color: var(--app-primary) !important;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --app-shadow: 0 4px 12px rgba(44, 31, 26, 0.04);
+  }
+
+  .app-scroll {
+    scroll-padding-bottom: 6rem;
+  }
+
+  .shadow-\[0_22px_44px_rgba\(79\2c 56\2c 47\2c 0\.08\)\],
+  .shadow-\[0_18px_42px_rgba\(79\2c 56\2c 47\2c 0\.08\)\],
+  .shadow-\[0_14px_24px_rgba\(79\2c 56\2c 47\2c 0\.16\)\],
+  .shadow-\[0_12px_24px_rgba\(93\2c 64\2c 55\2c 0\.18\)\],
+  .shadow-\[0_12px_24px_rgba\(122\2c 95\2c 65\2c 0\.2\)\],
+  .shadow-\[0_28px_62px_rgba\(71\2c 51\2c 41\2c 0\.16\)\] {
+    box-shadow: var(--app-shadow) !important;
+  }
+
+  .transition {
+    transition-duration: 120ms;
+  }
+}

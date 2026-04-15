@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#872be3",
+                        "accent": "#FFD700",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#0d0915",
+                        "glass": "rgba(255, 255, 255, 0.03)",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top right, #1e1333, #0d0915);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header -->
+<header class="flex items-center justify-between p-4 pt-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white">account_balance_wallet</span>
+</div>
+<div>
+<h1 class="text-lg font-bold tracking-tight">AdminAmigo 360</h1>
+<p class="text-xs text-slate-400">Panel de Cobranzas</p>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center glass-card">
+<span class="material-symbols-outlined text-slate-100">notifications</span>
+</button>
+</header>
+<main class="flex-1 px-4 pb-24">
+<!-- Collection Overview Chart -->
+<section class="mt-4 glass-card rounded-xl p-5 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-8xl">insights</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">Recaudación Mensual</p>
+<div class="flex items-baseline gap-2 mt-1">
+<h2 class="text-3xl font-bold text-white">$45,200</h2>
+<span class="text-emerald-400 text-sm font-bold flex items-center">
+<span class="material-symbols-outlined text-sm">trending_up</span> 12%
+                </span>
+</div>
+<div class="flex items-end justify-between h-32 mt-6 gap-2">
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-primary rounded-t-lg transition-all duration-500" style="height: 60%"></div>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Ene</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative">
+<div class="absolute bottom-0 w-full bg-primary rounded-t-lg" style="height: 45%"></div>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Feb</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative">
+<div class="absolute bottom-0 w-full bg-accent rounded-t-lg" style="height: 85%"></div>
+</div>
+<span class="text-[10px] text-slate-300 font-bold uppercase tracking-tighter">Mar</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative">
+<div class="absolute bottom-0 w-full bg-primary rounded-t-lg" style="height: 70%"></div>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Abr</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative">
+<div class="absolute bottom-0 w-full bg-primary rounded-t-lg" style="height: 55%"></div>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">May</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative">
+<div class="absolute bottom-0 w-full bg-primary rounded-t-lg" style="height: 95%"></div>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Jun</span>
+</div>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="mt-6 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+<button class="flex-none bg-primary hover:bg-primary/90 text-white px-4 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined text-lg">add_card</span>
+<span class="text-sm font-semibold whitespace-nowrap">Registrar pago</span>
+</button>
+<button class="flex-none glass-card text-white px-4 py-3 rounded-xl flex items-center gap-2 border border-slate-700 transition-all">
+<span class="material-symbols-outlined text-lg">send_and_archive</span>
+<span class="text-sm font-semibold whitespace-nowrap">Enviar recordatorio</span>
+</button>
+<button class="flex-none glass-card text-white px-4 py-3 rounded-xl flex items-center gap-2 border border-slate-700 transition-all">
+<span class="material-symbols-outlined text-lg">description</span>
+<span class="text-sm font-semibold whitespace-nowrap">Generar reporte</span>
+</button>
+</section>
+<!-- Apartment List Filters -->
+<section class="mt-8">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold">Unidades</h3>
+<div class="flex bg-slate-800/50 p-1 rounded-lg border border-slate-700">
+<button class="px-3 py-1 bg-primary text-white text-xs font-bold rounded-md">Todos</button>
+<button class="px-3 py-1 text-slate-400 text-xs font-bold rounded-md">Mora</button>
+</div>
+</div>
+<!-- List -->
+<div class="space-y-3">
+<!-- Card 1: Delinquent -->
+<div class="glass-card rounded-xl p-4 flex items-center justify-between border-l-4 border-l-rose-500">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400">apartment</span>
+</div>
+<div>
+<h4 class="font-bold text-white">Torre A - 402</h4>
+<p class="text-xs text-rose-400 font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">error</span> En mora (2 meses)
+                            </p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-bold text-white">$450.00</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Deuda total</p>
+</div>
+</div>
+<!-- Card 2: Paid -->
+<div class="glass-card rounded-xl p-4 flex items-center justify-between border-l-4 border-l-emerald-500">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400">apartment</span>
+</div>
+<div>
+<h4 class="font-bold text-white">Torre C - 105</h4>
+<p class="text-xs text-emerald-400 font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Al día
+                            </p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-bold text-slate-400">$0.00</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Sin deuda</p>
+</div>
+</div>
+<!-- Card 3: Pending -->
+<div class="glass-card rounded-xl p-4 flex items-center justify-between border-l-4 border-l-primary">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400">apartment</span>
+</div>
+<div>
+<h4 class="font-bold text-white">Torre B - 210</h4>
+<p class="text-xs text-primary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">pending</span> Pago pendiente
+                            </p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-bold text-white">$225.00</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Mes actual</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Payment History Preview -->
+<section class="mt-8">
+<h3 class="text-lg font-bold mb-4">Últimos Pagos</h3>
+<div class="glass-card rounded-xl divide-y divide-slate-800">
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-full bg-emerald-500/10 text-emerald-500">
+<span class="material-symbols-outlined">receipt_long</span>
+</div>
+<div>
+<p class="text-sm font-bold">Transferencia Recibida</p>
+<p class="text-[10px] text-slate-500">Hoy, 10:45 AM • Torre D-301</p>
+</div>
+</div>
+<p class="text-sm font-bold text-accent">+$225.00</p>
+</div>
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-full bg-emerald-500/10 text-emerald-500">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<p class="text-sm font-bold">Pago en Efectivo</p>
+<p class="text-[10px] text-slate-500">Ayer, 4:20 PM • Torre A-102</p>
+</div>
+</div>
+<p class="text-sm font-bold text-accent">+$225.00</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full glass-card border-t border-slate-800 bg-background-dark/90 backdrop-blur-xl px-2 pb-6 pt-3 z-50">
+<div class="flex justify-around items-center max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-slate-500 group" href="{{DATA:SCREEN:SCREEN_6}}">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Inicio</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="{{DATA:SCREEN:SCREEN_4}}">
+<span class="material-symbols-outlined text-[24px] fill-1">account_balance_wallet</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Pagos</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="{{DATA:SCREEN:SCREEN_3}}">
+<span class="material-symbols-outlined text-[24px]">apartment</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Unidades</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="{{DATA:SCREEN:SCREEN_9}}">
+<span class="material-symbols-outlined text-[24px]">monitoring</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Reportes</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="{{DATA:SCREEN:SCREEN_8}}">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Ajustes</span>
+</a>
+</div>
+</nav>
+</body></html>

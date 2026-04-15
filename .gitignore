@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+dist/
+build/
+.next/
+out/
+.vercel/
+coverage/
+*.log
+*.swp
+.env
+.env.*
+!.env.example

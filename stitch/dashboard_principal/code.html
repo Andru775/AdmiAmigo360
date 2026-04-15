@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Adminamigo 360 - Residential Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#872be3",
+                        "accent-gold": "#d4af37",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#0a0612",
+                        "glass-bg": "rgba(135, 43, 227, 0.1)",
+                        "glass-border": "rgba(212, 175, 55, 0.2)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(30, 20, 45, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(135, 43, 227, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .metallic-gradient {
+            background: linear-gradient(135deg, #872be3 0%, #d4af37 100%);
+        }
+        .chart-glow {
+            filter: drop-shadow(0 0 8px rgba(135, 43, 227, 0.5));
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen pb-24">
+<!-- Header Section -->
+<header class="flex items-center justify-between p-6 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full border-2 border-primary/50 p-0.5 overflow-hidden">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="User profile avatar with futuristic purple aesthetic" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAzwq573B94zXmAM8Amc_t5AX5qBlU2vlqngu_ZTGb68UwVETWzovtXyh7UIKpEVt7F6MSZ926XqN4MqwQzmeus4s-HjWDyMK4mw_zLIr0AfOInhCVkJXoK_ZZIMZs2B-ELf9T3IgNcMyZoq9EB74ULcIgRJr5D3gppZSGRspIOrBRWq_vYUgOL98lhmzeMs8oEKODoYKhRCYFY4zGlYhSHTe3vizi2Nc7ZgKw58DFvls1ACsuU4odDbv4b7qcynq6z1ZxWI7u5yKpJ');"></div>
+</div>
+<div>
+<h1 class="text-lg font-bold tracking-tight text-slate-100">Adminamigo 360</h1>
+<p class="text-[10px] uppercase tracking-widest text-primary font-semibold">Residential SaaS</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="relative p-2 rounded-xl glass-card text-slate-100">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-accent-gold rounded-full border border-background-dark"></span>
+</button>
+</div>
+</header>
+<main class="px-4 py-6 space-y-6">
+<!-- Hero Metrics -->
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-card p-4 rounded-xl relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 size-16 bg-primary/10 rounded-full blur-2xl"></div>
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-primary text-xl">payments</span>
+<span class="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded-full">+12%</span>
+</div>
+<p class="text-slate-400 text-xs font-medium">Monthly Collection</p>
+<p class="text-xl font-bold text-slate-100 mt-1">$45.2k</p>
+</div>
+<div class="glass-card p-4 rounded-xl relative overflow-hidden">
+<div class="absolute -right-4 -top-4 size-16 bg-accent-gold/10 rounded-full blur-2xl"></div>
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-accent-gold text-xl">home_work</span>
+<span class="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded-full">94%</span>
+</div>
+<p class="text-slate-400 text-xs font-medium">Occupancy Rate</p>
+<p class="text-xl font-bold text-slate-100 mt-1">124 Units</p>
+</div>
+</div>
+<!-- Financial Chart Section -->
+<section class="glass-card p-6 rounded-xl border-t border-primary/30">
+<div class="flex items-end justify-between mb-6">
+<div>
+<h2 class="text-slate-100 font-bold text-lg">Financial Yield</h2>
+<p class="text-slate-400 text-xs">Revenue performance (6mo)</p>
+</div>
+<div class="text-right">
+<p class="text-2xl font-bold text-slate-100">$124,000</p>
+<p class="text-xs text-accent-gold font-semibold">Target: $135k</p>
+</div>
+</div>
+<div class="h-32 w-full flex items-end gap-2 px-1">
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[40%] group relative">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity">Jan</div>
+</div>
+<div class="flex-1 bg-primary/30 rounded-t-lg h-[60%]"></div>
+<div class="flex-1 bg-primary/40 rounded-t-lg h-[55%]"></div>
+<div class="flex-1 bg-primary/60 rounded-t-lg h-[85%]"></div>
+<div class="flex-1 bg-primary/80 rounded-t-lg h-[70%]"></div>
+<div class="flex-1 bg-primary rounded-t-lg h-full shadow-[0_0_15px_rgba(135,43,227,0.4)]"></div>
+</div>
+<div class="flex justify-between mt-3 px-1">
+<span class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">Jan</span>
+<span class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">Feb</span>
+<span class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">Mar</span>
+<span class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">Apr</span>
+<span class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">May</span>
+<span class="text-[9px] text-primary font-bold uppercase tracking-tighter">Jun</span>
+</div>
+</section>
+<!-- Operational Status -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-slate-100 font-bold text-sm uppercase tracking-widest">Priority Operations</h3>
+<span class="text-xs text-primary font-bold">View All</span>
+</div>
+<div class="space-y-3">
+<!-- Alert 1 -->
+<a class="glass-card flex items-center p-4 rounded-xl gap-4 border-l-4 border-l-red-500" href="{{DATA:SCREEN:SCREEN_8}}">
+<div class="size-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
+<span class="material-symbols-outlined">engineering</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-100 text-sm font-semibold">Elevator Maintenance</p>
+<p class="text-slate-400 text-[11px]">Tower B - 3 Urgent requests</p>
+</div>
+<span class="text-red-500 material-symbols-outlined text-lg">priority_high</span>
+</a>
+<!-- Alert 2 -->
+<a class="glass-card flex items-center p-4 rounded-xl gap-4 border-l-4 border-l-accent-gold" href="{{DATA:SCREEN:SCREEN_4}}">
+<div class="size-10 rounded-lg bg-accent-gold/10 flex items-center justify-center text-accent-gold">
+<span class="material-symbols-outlined">receipt_long</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-100 text-sm font-semibold">Late Payments</p>
+<p class="text-slate-400 text-[11px]">15 Units pending - Jun 15th</p>
+</div>
+<button class="bg-accent-gold text-background-dark text-[10px] font-black px-3 py-1 rounded-full uppercase">Remind</button>
+</a>
+<!-- Alert 3 -->
+<div class="glass-card flex items-center p-4 rounded-xl gap-4 border-l-4 border-l-primary">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">security</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-100 text-sm font-semibold">Security Update</p>
+<p class="text-slate-400 text-[11px]">CCTV Main Entrance - Repaired</p>
+</div>
+<span class="text-primary material-symbols-outlined text-lg">check_circle</span>
+</div>
+</div>
+</section>
+<!-- Quick Actions Grid -->
+<section class="grid grid-cols-4 gap-4 pb-4">
+<a class="flex flex-col items-center gap-2" href="{{DATA:SCREEN:SCREEN_3}}">
+<div class="size-12 rounded-2xl glass-card flex items-center justify-center text-slate-100">
+<span class="material-symbols-outlined">person_add</span>
+</div>
+<span class="text-[10px] font-medium text-slate-400 text-center leading-tight">Add Resident</span>
+</a>
+<div class="flex flex-col items-center gap-2">
+<div class="size-12 rounded-2xl glass-card flex items-center justify-center text-slate-100">
+<span class="material-symbols-outlined">summarize</span>
+</div>
+<span class="text-[10px] font-medium text-slate-400 text-center leading-tight">Reports</span>
+</div>
+<a class="flex flex-col items-center gap-2" href="{{DATA:SCREEN:SCREEN_7}}">
+<div class="size-12 rounded-2xl glass-card flex items-center justify-center text-slate-100">
+<span class="material-symbols-outlined">event</span>
+</div>
+<span class="text-[10px] font-medium text-slate-400 text-center leading-tight">Amenities</span>
+</a>
+<a class="flex flex-col items-center gap-2" href="{{DATA:SCREEN:SCREEN_4}}">
+<div class="size-12 rounded-2xl glass-card flex items-center justify-center text-slate-100">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<span class="text-[10px] font-medium text-slate-400 text-center leading-tight">Expenses</span>
+</a>
+</section>
+</main>
+<!-- Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-[100] bg-background-dark/90 backdrop-blur-xl border-t border-primary/20 px-6 pb-6 pt-3">
+<div class="flex items-center justify-between max-w-lg mx-auto">
+<a class="flex flex-col items-center gap-1 text-primary" href="{{DATA:SCREEN:SCREEN_6}}">
+<span class="material-symbols-outlined fill-1">dashboard</span>
+<span class="text-[10px] font-bold">Panel</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="{{DATA:SCREEN:SCREEN_3}}">
+<span class="material-symbols-outlined">apartment</span>
+<span class="text-[10px] font-medium">Units</span>
+</a>
+<div class="relative -top-8">
+<a class="size-14 rounded-full metallic-gradient shadow-[0_0_20px_rgba(135,43,227,0.5)] flex items-center justify-center text-slate-100 border-4 border-background-dark" href="{{DATA:SCREEN:SCREEN_9}}">
+<span class="material-symbols-outlined text-3xl">add</span>
+</a>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="{{DATA:SCREEN:SCREEN_4}}">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-[10px] font-medium">Bills</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="{{DATA:SCREEN:SCREEN_8}}">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Config</span>
+</a>
+</div>
+</nav>
+</body></html>
