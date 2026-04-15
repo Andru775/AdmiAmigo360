@@ -103,7 +103,6 @@ export default function LoginPage() {
 
       if (user?.email) {
         const params = new URLSearchParams({
-          tab: "request",
           email: user.email,
           source: "oauth",
         });
@@ -111,7 +110,7 @@ export default function LoginPage() {
         await supabase.auth.signOut();
 
         if (active) {
-          router.replace(`/support?${params.toString()}`);
+          router.replace(`/request-access?${params.toString()}`);
         }
 
         return;
@@ -332,7 +331,7 @@ export default function LoginPage() {
                 </div>
 
                 <Link
-                  href="/support?tab=request"
+                  href="/request-access"
                   className="mt-3 app-button-secondary flex h-[3.8rem] items-center justify-center gap-2 rounded-[1rem] text-[0.95rem] font-semibold"
                 >
                   <Icon name="person_add" className="text-[1rem]" />

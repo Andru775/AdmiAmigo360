@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 
-import { sendPasswordResetEmail } from "@/lib/supabase/auth-emails";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
 function normalizeText(value: string) {
@@ -22,10 +21,6 @@ function phoneMatches(storedPhone: string, inputPhone: string) {
   return Boolean(stored && input && (stored === input || stored.endsWith(input) || input.endsWith(stored)));
 }
 
-function genericSuccessMessage() {
-  return "Si los datos coinciden con una cuenta registrada, enviaremos un enlace seguro al correo asociado para recuperar el acceso.";
-}
-
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Record<string, unknown>;
@@ -42,6 +37,7 @@ export async function POST(request: Request) {
     }
 
     const adminClient = getSupabaseAdminClient();
+    let matchedEmail = "";
     const unitResult = await adminClient
       .from("units")
       .select("id")
@@ -64,15 +60,25 @@ export async function POST(request: Request) {
         });
 
         if (targetResident?.email) {
-          const redirectTo = `${new URL(request.url).origin}/reset-password`;
-          await sendPasswordResetEmail(targetResident.email, redirectTo);
+          matchedEmail = String(targetResident.email).trim().toLowerCase();
         }
       }
     }
 
+    if (!matchedEmail) {
+      return NextResponse.json(
+        {
+          error:
+            "No encontramos una cuenta activa con esos datos. Revisa la información o solicita soporte a administración.",
+        },
+        { status: 404 },
+      );
+    }
+
     return NextResponse.json({
       sent: true,
-      message: genericSuccessMessage(),
+      email: matchedEmail,
+      message: `El correo vinculado a esta vivienda es ${matchedEmail}. Si no recuerdas la contraseña, usa ese correo en recuperación.`,
     });
   } catch (error) {
     return NextResponse.json(
