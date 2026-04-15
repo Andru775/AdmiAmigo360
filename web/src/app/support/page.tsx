@@ -58,6 +58,7 @@ export default function SupportPage() {
   const [requestForm, setRequestForm] = useState(initialRequestState);
   const [requestLoading, setRequestLoading] = useState(false);
   const [requestResult, setRequestResult] = useState<ApiResult | null>(null);
+  const [requestSource, setRequestSource] = useState("");
 
   const redirectTo = useMemo(() => {
     if (typeof window === "undefined") {
@@ -75,6 +76,7 @@ export default function SupportPage() {
     const params = new URLSearchParams(window.location.search);
     const nextTab = params.get("tab");
     const nextEmail = params.get("email");
+    const nextSource = params.get("source");
 
     if (nextTab === "password" || nextTab === "account" || nextTab === "request") {
       setActiveTab(nextTab);
@@ -83,6 +85,10 @@ export default function SupportPage() {
     if (nextEmail) {
       setEmail(nextEmail);
       setRequestForm((current) => ({ ...current, email: nextEmail }));
+    }
+
+    if (nextSource === "oauth") {
+      setRequestSource(nextSource);
     }
   }, []);
 
@@ -99,7 +105,7 @@ export default function SupportPage() {
 
       const normalizedEmail = email.trim().toLowerCase();
       if (!normalizedEmail.includes("@")) {
-        throw new Error("Ingresa un correo valido para continuar.");
+        throw new Error("Ingresa un correo válido para continuar.");
       }
 
       const supabase = getSupabaseBrowserClient();
@@ -211,7 +217,7 @@ export default function SupportPage() {
       header={
         <HeaderBar
           title="Acceso y soporte"
-          subtitle="Recupera tu cuenta, solicita activación como residente y mantén el ingreso protegido sin exponer información sensible."
+          subtitle="Ayuda para entrar, recuperar contraseña o solicitar acceso."
           icon="support_agent"
           action={
             <Link
@@ -249,13 +255,12 @@ export default function SupportPage() {
           {activeTab === "password" ? (
             <form className="mt-5 space-y-4" onSubmit={handlePasswordRecovery}>
               <div>
-                <p className="app-kicker">Password Recovery</p>
+                <p className="app-kicker">Recuperación</p>
                 <h2 className="app-display mt-2 text-[1.45rem] font-[680] text-[var(--app-heading)]">
                   Restablece tu contraseña
                 </h2>
                 <p className="mt-2 text-[0.92rem] leading-6 text-[var(--app-muted)]">
-                  Usa este flujo si ya recuerdas tu correo. El enlace llega al email registrado y
-                  desde ahi defines una nueva contraseña.
+                  Ingresa tu correo y te enviaremos un enlace para definir una nueva contraseña.
                 </p>
               </div>
 
@@ -301,13 +306,13 @@ export default function SupportPage() {
           {activeTab === "account" ? (
             <form className="mt-5 space-y-4" onSubmit={handleSilentRecovery}>
               <div>
-                <p className="app-kicker">Secure Account Recovery</p>
+                <p className="app-kicker">Buscar cuenta</p>
                 <h2 className="app-display mt-2 text-[1.45rem] font-[680] text-[var(--app-heading)]">
                   No recuerdas tu correo
                 </h2>
                 <p className="mt-2 text-[0.92rem] leading-6 text-[var(--app-muted)]">
-                  Validamos identidad con tu nombre, unidad y teléfono. Si coincide con un acceso
-                  activo, enviamos el enlace al correo registrado sin mostrarlo en pantalla.
+                  Si los datos coinciden con una cuenta activa, enviaremos el enlace al correo
+                  registrado sin mostrarlo en pantalla.
                 </p>
               </div>
 
@@ -392,15 +397,20 @@ export default function SupportPage() {
           {activeTab === "request" ? (
             <form className="mt-5 space-y-4" onSubmit={handleAccessRequest}>
               <div>
-                <p className="app-kicker">Resident Access Request</p>
+                <p className="app-kicker">Solicitud de acceso</p>
                 <h2 className="app-display mt-2 text-[1.45rem] font-[680] text-[var(--app-heading)]">
                   Solicita tu acceso como residente
                 </h2>
                 <p className="mt-2 text-[0.92rem] leading-6 text-[var(--app-muted)]">
-                  Este formulario registra la solicitud para que administración valide tu unidad y
-                  habilite el acceso. No entrega permisos inmediatos.
+                  Completa tus datos para que administración valide la vivienda y active el acceso.
                 </p>
               </div>
+
+              {requestSource === "oauth" ? (
+                <div className="rounded-[1rem] border border-[rgba(159,122,86,0.18)] bg-[#F7F1EA] px-4 py-3 text-[0.9rem] leading-6 text-[var(--app-heading)]">
+                  El correo ya fue verificado. Falta vincularlo a una vivienda del conjunto.
+                </div>
+              ) : null}
 
               <label className="block">
                 <span className="mb-2 block text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
@@ -523,7 +533,7 @@ export default function SupportPage() {
                   value={requestForm.notes}
                   onChange={(event) => updateRequestField("notes", event.target.value)}
                   className="app-input min-h-[7rem] w-full rounded-[1rem] px-4 py-3 outline-none"
-                  placeholder="Ejemplo: recien me entregaron el apartamento o necesito activar acceso para reservas."
+                  placeholder="Ejemplo: recién me entregaron el apartamento o necesito activar acceso para reservas."
                 />
               </label>
 
@@ -551,17 +561,6 @@ export default function SupportPage() {
           ) : null}
         </GlassCard>
 
-        <GlassCard className="rounded-[1.5rem] p-5">
-          <p className="app-kicker">Security Rules</p>
-          <h3 className="app-display mt-2 text-[1.2rem] font-[680] text-[var(--app-heading)]">
-            Criterios de seguridad del acceso
-          </h3>
-          <div className="mt-4 space-y-3 text-[0.92rem] leading-6 text-[var(--app-muted)]">
-            <p>1. Los administradores recuperan acceso solo por correo verificado.</p>
-            <p>2. Los residentes nunca ven en pantalla el correo registrado de otra cuenta.</p>
-            <p>3. Las solicitudes nuevas quedan pendientes hasta validación administrativa.</p>
-          </div>
-        </GlassCard>
       </div>
     </AppScreen>
   );

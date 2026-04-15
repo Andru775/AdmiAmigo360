@@ -83,7 +83,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "No encontramos el conjunto asociado a está app. Verifica el código del conjunto con administración.",
+            "No encontramos el conjunto asociado a esta app. Verifica el código del conjunto con administración.",
         },
         { status: 404 },
       );
@@ -130,47 +130,6 @@ export async function POST(request: Request) {
         {
           error:
             "Ya existe una cuenta activa con ese correo. Usa la recuperación de acceso o inicia sesión directamente.",
-        },
-        { status: 409 },
-      );
-    }
-
-    const existingUnitResident = await adminClient
-      .from("residents")
-      .select("id, email, full_name, profile_id")
-      .eq("property_id", propertyId)
-      .eq("unit_id", unitResult.data.id)
-      .maybeSingle();
-
-    if (existingUnitResident.error) {
-      return NextResponse.json(
-        { error: "No fue posible validar el estado de la unidad." },
-        { status: 500 },
-      );
-    }
-
-    if (
-      existingUnitResident.data?.profile_id &&
-      existingUnitResident.data.email?.toLowerCase() !== email
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "La unidad ya tiene un acceso activo asociado. Si eres el residente actual, contacta a la administración para validar el cambio.",
-        },
-        { status: 409 },
-      );
-    }
-
-    if (
-      existingUnitResident.data &&
-      !existingUnitResident.data.profile_id &&
-      existingUnitResident.data.email?.toLowerCase() !== email
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Ya existe una solicitud pendiente para esa unidad. La administración debe revisarla antes de crear otra.",
         },
         { status: 409 },
       );
@@ -234,7 +193,7 @@ export async function POST(request: Request) {
     await adminClient.from("operations").insert({
       property_id: propertyId,
       title: "Solicitud de acceso",
-      note: `${fullName} solicito acceso para ${tower} ${unitCode}. Método: ${preferredProvider}. Correo: ${email}.`,
+      note: `${fullName} solicitó acceso para ${tower} ${unitCode}. Método: ${preferredProvider}. Correo: ${email}.`,
       priority: "medium",
       icon: "person_add",
       status: "open",

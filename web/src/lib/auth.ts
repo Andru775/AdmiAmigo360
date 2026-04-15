@@ -14,6 +14,20 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export type ResidentOAuthProvider = "google" | "azure";
 
+function getPasswordLoginMessage(message: string) {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("email not confirmed")) {
+    return "Confirma tu correo antes de iniciar sesión.";
+  }
+
+  if (normalized.includes("invalid login credentials")) {
+    return "Correo o contraseña incorrectos. Si no recuerdas la clave, solicita un enlace de recuperación.";
+  }
+
+  return "No fue posible iniciar sesión. Revisa los datos e intenta nuevamente.";
+}
+
 async function buildSupabaseSession() {
   const token = await getSupabaseAccessToken();
   const headers = new Headers();
@@ -62,6 +76,13 @@ export async function loginWithPassword(role: DemoRole, email: string, password:
   const normalizedEmail = email.trim().toLowerCase();
   const normalizedPassword = password.trim();
 
+  if (!normalizedEmail || !normalizedPassword) {
+    return {
+      error: "Ingresa correo y contraseña para continuar.",
+      mode: isSupabaseConfigured() ? ("supabase" as const) : ("demo" as const),
+    };
+  }
+
   if (!isSupabaseConfigured()) {
     const session = authenticateDemoUser(role, normalizedEmail, normalizedPassword);
 
@@ -92,7 +113,7 @@ export async function loginWithPassword(role: DemoRole, email: string, password:
 
   if (error) {
     return {
-      error: "No se pudo iniciar sesión con Supabase. Verifica correo y contraseña.",
+      error: getPasswordLoginMessage(error.message),
       mode: "supabase" as const,
     };
   }
@@ -102,7 +123,8 @@ export async function loginWithPassword(role: DemoRole, email: string, password:
   if (!session) {
     await supabase.auth.signOut();
     return {
-      error: "La cuenta no tiene perfil activo en la app. Revisa la tabla profiles.",
+      error:
+        "Tu cuenta existe, pero todavía no tiene una vivienda o un rol activo vinculado. Solicita acceso o contacta a administración.",
       mode: "supabase" as const,
     };
   }
@@ -111,7 +133,10 @@ export async function loginWithPassword(role: DemoRole, email: string, password:
     await supabase.auth.signOut();
     clearSession();
     return {
-      error: "El rol seleccionado no coincide con el perfil de esta cuenta.",
+      error:
+        role === "admin"
+          ? "Esta cuenta no tiene permiso para entrar como administrador."
+          : "Esta cuenta no está habilitada como residente.",
       mode: "supabase" as const,
     };
   }

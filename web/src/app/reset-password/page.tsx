@@ -41,6 +41,45 @@ export default function ResetPasswordPage() {
     let active = true;
 
     const resolveRecovery = async () => {
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get("code");
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
+
+      if (code) {
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+
+        if (!active) {
+          return;
+        }
+
+        if (exchangeError) {
+          setError("El enlace de recuperación no pudo validarse. Solicita uno nuevo.");
+          setIsLoading(false);
+          return;
+        }
+
+        window.history.replaceState(null, "", "/reset-password");
+      } else if (accessToken && refreshToken) {
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (!active) {
+          return;
+        }
+
+        if (sessionError) {
+          setError("El enlace de recuperación no pudo validarse. Solicita uno nuevo.");
+          setIsLoading(false);
+          return;
+        }
+
+        window.history.replaceState(null, "", "/reset-password");
+      }
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -127,7 +166,7 @@ export default function ResetPasswordPage() {
           <GlassCard className="rounded-[2rem] p-5">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="app-kicker">Password Reset</p>
+                <p className="app-kicker">Recuperación</p>
                 <h1 className="app-display mt-2 text-[1.9rem] font-[680] leading-[1.02] text-[var(--app-heading)]">
                   Nueva contraseña
                 </h1>
@@ -153,10 +192,10 @@ export default function ResetPasswordPage() {
             {!isLoading && !isReady ? (
               <div className="mt-6 space-y-4">
                 <div className="rounded-[1rem] border border-[rgba(161,90,73,0.18)] bg-[var(--app-danger-bg)] px-4 py-4 text-[0.92rem] text-[var(--app-danger)]">
-                  El enlace ya no es valido o no llego una sesión de recuperación.
+                  {error || "El enlace ya no es válido o no llegó una sesión de recuperación."}
                 </div>
                 <Link
-                  href="/support"
+                  href="/support?tab=password"
                   className="app-button-secondary flex h-12 items-center justify-center rounded-[1rem] text-[0.95rem] font-semibold"
                 >
                   Solicitar otro enlace
@@ -175,7 +214,7 @@ export default function ResetPasswordPage() {
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                    placeholder="Minimo 8 caracteres"
+                    placeholder="Mínimo 8 caracteres"
                   />
                 </label>
 

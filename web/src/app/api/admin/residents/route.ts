@@ -6,8 +6,8 @@ import { getRequestContext } from "@/lib/supabase/request-context";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { getRequestSupabaseUser } from "@/lib/supabase/request-user";
 
-function residentSlugFromUnit(tower: string, unitCode: string) {
-  return `${tower}-${unitCode}`.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+function residentSlugFromUnit(tower: string, unitCode: string, email: string) {
+  return `${tower}-${unitCode}-${email}`.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
 
 export async function GET(request: Request) {
@@ -113,26 +113,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No fue posible crear o ubicar la unidad." }, { status: 500 });
     }
 
-    const existingResidentInUnit = await adminClient
-      .from("residents")
-      .select("id, full_name, email")
-      .eq("unit_id", unitUpsert.data.id)
-      .neq("email", email)
-      .maybeSingle();
-
-    if (existingResidentInUnit.error) {
-      return NextResponse.json({ error: "No fue posible validar la ocupación de la unidad." }, { status: 500 });
-    }
-
-    if (existingResidentInUnit.data) {
-      return NextResponse.json(
-        {
-          error: `La unidad ${tower} - ${unitCode} ya está asignada a ${existingResidentInUnit.data.full_name}. Usa otra unidad o edita ese residente.`,
-        },
-        { status: 409 },
-      );
-    }
-
     const listResult = await adminClient.auth.admin.listUsers({ page: 1, perPage: 1000 });
     const existingUser = listResult.data.users.find(
       (candidate) => candidate.email?.toLowerCase() === email,
@@ -173,7 +153,7 @@ export async function POST(request: Request) {
           profile_id: authUserId,
           property_id: profile.property_id,
           unit_id: unitUpsert.data.id,
-          slug: residentSlugFromUnit(tower, unitCode),
+          slug: residentSlugFromUnit(tower, unitCode, email),
           full_name: fullName,
           email,
           phone,
@@ -193,7 +173,7 @@ export async function POST(request: Request) {
         {
           error:
             residentUpsert.error.code === "23505"
-              ? "Ese correo o esa unidad ya tienen un residente asociado."
+              ? "Ese correo ya tiene un residente asociado."
               : "No fue posible guardar el residente.",
         },
         { status: residentUpsert.error.code === "23505" ? 409 : 500 },

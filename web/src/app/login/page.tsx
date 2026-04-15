@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { AppViewport } from "@/components/app/AppViewport";
@@ -41,8 +41,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [recovered, setRecovered] = useState(false);
-  const [oauthInfo, setOauthInfo] = useState("");
-  const [oauthEmailHint, setOauthEmailHint] = useState("");
   const [oauthSubmitting, setOauthSubmitting] = useState<ResidentOAuthProvider | null>(null);
   const usingSupabase = isSupabaseConfigured();
 
@@ -60,7 +58,6 @@ export default function LoginPage() {
     const params = new URLSearchParams(window.location.search);
     const recoveredFlag = params.get("recovered") === "1";
     const oauthError = params.get("oauth_error");
-    const oauthAttempt = params.get("oauth") === "1";
 
     const timer = window.setTimeout(() => {
       setRecovered(recoveredFlag);
@@ -68,10 +65,6 @@ export default function LoginPage() {
       if (oauthError) {
         setError(
           "No fue posible completar el acceso con el proveedor seleccionado. Revisa la configuración de Google o Microsoft en Supabase.",
-        );
-      } else if (oauthAttempt) {
-        setOauthInfo(
-          "Si tu cuenta social ya está vinculada al conjunto, entraremos automáticamente. Si es tu primera vez, te guiaremos a solicitar acceso.",
         );
       }
     }, 0);
@@ -109,12 +102,24 @@ export default function LoginPage() {
       }
 
       if (user?.email) {
-        setOauthEmailHint(user.email);
-        setError(
-          "La autenticación externa fue valida, pero esta cuenta todavia no está vinculada a un residente o administrador activo. Solicita acceso o pide validación a la administración.",
-        );
+        const params = new URLSearchParams({
+          tab: "request",
+          email: user.email,
+          source: "oauth",
+        });
+
+        await supabase.auth.signOut();
+
+        if (active) {
+          router.replace(`/support?${params.toString()}`);
+        }
+
+        return;
       }
 
+      setError(
+        "El proveedor no entregó un correo verificado. Intenta con correo y contraseña o solicita soporte.",
+      );
       await supabase.auth.signOut();
     }, 450);
 
@@ -122,7 +127,7 @@ export default function LoginPage() {
       active = false;
       window.clearTimeout(timer);
     };
-  }, [isLoading, session, usingSupabase]);
+  }, [isLoading, router, session, usingSupabase]);
 
   function applyRole(nextRole: DemoRole) {
     const defaults = roleDefaults(nextRole);
@@ -130,14 +135,12 @@ export default function LoginPage() {
     setEmail(defaults.email);
     setPassword(defaults.password);
     setError("");
-    setOauthInfo("");
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
     setError("");
-    setOauthInfo("");
 
     const result = await loginWithPassword(role, email, password);
 
@@ -153,13 +156,12 @@ export default function LoginPage() {
   async function handleOAuth(provider: ResidentOAuthProvider) {
     setOauthSubmitting(provider);
     setError("");
-    setOauthInfo("");
 
     const result = await loginWithOAuth(provider);
 
     if (result.error) {
       setError(
-        `No fue posible iniciar con ${providerLabel(provider)}. Verifica que el proveedor este activo en Supabase.`,
+        `No fue posible iniciar con ${providerLabel(provider)}. Verifica que el proveedor esté activo en Supabase.`,
       );
       setOauthSubmitting(null);
       return;
@@ -175,18 +177,6 @@ export default function LoginPage() {
 
     window.location.assign(result.url);
   }
-
-  const accessRequestHref = useMemo(() => {
-    const base = new URLSearchParams({
-      tab: "request",
-    });
-
-    if (oauthEmailHint) {
-      base.set("email", oauthEmailHint);
-    }
-
-    return `/support?${base.toString()}`;
-  }, [oauthEmailHint]);
 
   return (
     <AppViewport>
@@ -237,24 +227,6 @@ export default function LoginPage() {
                   );
                 })}
               </div>
-            </div>
-
-            <div className="mt-4 rounded-[1.2rem] border border-[var(--app-card-border)] bg-[var(--app-surface-soft)] px-4 py-3">
-              <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
-                {role === "admin" ? "Acceso restringido" : "Acceso residente"}
-              </p>
-              <p className="mt-2 text-[0.9rem] leading-6 text-[var(--app-muted)]">
-                {role === "admin"
-                  ? "Los administradores solo ingresan con cuentas aprobadas y recuperan acceso exclusivamente por correo verificado."
-                  : "Los residentes pueden entrar con correo y contraseña o vincular proveedores como Google y Microsoft una vez estén configurados y aprobados."}
-              </p>
-              {!usingSupabase ? (
-                <p className="mt-2 text-[0.82rem] font-medium text-[var(--app-primary)]">
-                  {role === "admin"
-                    ? "admin@admiamigo360.com / Admin360!"
-                    : "residente@admiamigo360.com / Resi360!"}
-                </p>
-              ) : null}
             </div>
 
             <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
@@ -321,12 +293,6 @@ export default function LoginPage() {
                 </div>
               ) : null}
 
-              {oauthInfo ? (
-                <div className="rounded-[1rem] border border-[rgba(159,122,86,0.18)] bg-[#F7F1EA] px-4 py-3 text-[0.9rem] text-[var(--app-heading)]">
-                  {oauthInfo}
-                </div>
-              ) : null}
-
               {recovered ? (
                 <div className="rounded-[1rem] border border-[rgba(86,114,96,0.18)] bg-[var(--app-success-bg)] px-4 py-3 text-[0.9rem] text-[var(--app-success)]">
                   Tu contraseña ya fue actualizada. Ingresa con la nueva clave.
@@ -366,7 +332,7 @@ export default function LoginPage() {
                 </div>
 
                 <Link
-                  href={accessRequestHref}
+                  href="/support?tab=request"
                   className="mt-3 app-button-secondary flex h-[3.8rem] items-center justify-center gap-2 rounded-[1rem] text-[0.95rem] font-semibold"
                 >
                   <Icon name="person_add" className="text-[1rem]" />
@@ -374,15 +340,13 @@ export default function LoginPage() {
                 </Link>
               </>
             ) : (
-              <div className="mt-6 rounded-[1.2rem] border border-[var(--app-card-border)] bg-[var(--app-surface-soft)] px-4 py-4">
-                <p className="text-[0.82rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
-                  Control administrativo
-                </p>
-                <p className="mt-2 text-[0.9rem] leading-6 text-[var(--app-muted)]">
-                  Las cuentas de administración deben ser creadas por AdmiAmigo o por el responsable
-                  maestro del conjunto. No hay autoregistro para administradores.
-                </p>
-              </div>
+              <Link
+                href="/support?tab=password"
+                className="mt-4 app-button-secondary flex h-[3.8rem] items-center justify-center gap-2 rounded-[1rem] text-[0.95rem] font-semibold"
+              >
+                <Icon name="lock_reset" className="text-[1rem]" />
+                Recuperar acceso administrativo
+              </Link>
             )}
           </section>
 
