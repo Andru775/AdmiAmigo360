@@ -21,8 +21,7 @@ const initialRequestState = {
   email: "",
   phone: "",
   tower: "Torre A",
-  levelLabel: "",
-  unitCode: "",
+  apartmentCode: "",
   residentType: "tenant",
   preferredProvider: "password",
   notes: "",
@@ -69,7 +68,7 @@ export default function RequestAccessPage() {
         },
         body: JSON.stringify({
           ...requestForm,
-          unitCode: requestForm.unitCode.toUpperCase(),
+          apartmentCode: requestForm.apartmentCode.toUpperCase(),
           propertyCode: "admiamigo-360",
         }),
       });
@@ -188,44 +187,30 @@ export default function RequestAccessPage() {
 
             <label className="block">
               <span className="mb-2 block text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
-                Nivel
+                Apartamento
               </span>
               <input
-                value={requestForm.levelLabel}
-                onChange={(event) => updateRequestField("levelLabel", event.target.value)}
+                value={requestForm.apartmentCode}
+                onChange={(event) => updateRequestField("apartmentCode", event.target.value.toUpperCase())}
                 className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                placeholder="Nivel 12"
+                placeholder="402"
               />
             </label>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <label className="block">
-              <span className="mb-2 block text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
-                Unidad
-              </span>
-              <input
-                value={requestForm.unitCode}
-                onChange={(event) => updateRequestField("unitCode", event.target.value.toUpperCase())}
-                className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                placeholder="12B"
-              />
-            </label>
-
-            <label className="block">
-              <span className="mb-2 block text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
-                Tipo
-              </span>
-              <select
-                value={requestForm.residentType}
-                onChange={(event) => updateRequestField("residentType", event.target.value)}
-                className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-              >
-                <option value="tenant">Inquilino</option>
-                <option value="owner">Propietario</option>
-              </select>
-            </label>
-          </div>
+          <label className="block">
+            <span className="mb-2 block text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
+              Tipo
+            </span>
+            <select
+              value={requestForm.residentType}
+              onChange={(event) => updateRequestField("residentType", event.target.value)}
+              className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
+            >
+              <option value="tenant">Inquilino</option>
+              <option value="owner">Propietario</option>
+            </select>
+          </label>
 
           <label className="block">
             <span className="mb-2 block text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">

@@ -340,7 +340,7 @@ export default function LoginPage() {
               </>
             ) : (
               <Link
-                href="/support?tab=password"
+                href="/admin-recovery"
                 className="mt-4 app-button-secondary flex h-[3.8rem] items-center justify-center gap-2 rounded-[1rem] text-[0.95rem] font-semibold"
               >
                 <Icon name="lock_reset" className="text-[1rem]" />

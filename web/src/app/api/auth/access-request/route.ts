@@ -40,7 +40,7 @@ function buildRequestNotes(
     "Solicitud de acceso enviada desde la app.",
     `Solicitante: ${fullName}.`,
     `Correo de contacto: ${email}.`,
-    `Unidad: ${tower} ${unitCode}.`,
+    `Apartamento: ${tower} ${unitCode}.`,
     `Método preferido: ${preferredProvider || "correo y contraseña"}.`,
     notes || "",
   ]
@@ -55,18 +55,18 @@ export async function POST(request: Request) {
     const email = String(body.email ?? "").trim().toLowerCase();
     const phone = String(body.phone ?? "").trim();
     const tower = normalizeTower(String(body.tower ?? ""));
-    const levelLabel = String(body.levelLabel ?? "").trim();
-    const unitCode = String(body.unitCode ?? "").trim().toUpperCase();
+    const unitCode = String(body.apartmentCode ?? body.unitCode ?? "").trim().toUpperCase();
+    const levelLabel = unitCode;
     const residentType = String(body.residentType ?? "tenant");
     const preferredProvider = String(body.preferredProvider ?? "password").trim();
     const notes = String(body.notes ?? "").trim();
     const propertyCode = String(body.propertyCode ?? "admiamigo-360").trim().toLowerCase();
 
-    if (!fullName || !email || !phone || !tower || !levelLabel || !unitCode) {
+    if (!fullName || !email || !phone || !tower || !unitCode) {
       return NextResponse.json(
         {
           error:
-            "Completa nombre, correo, teléfono, torre, nivel y unidad para solicitar el acceso.",
+            "Completa nombre, correo, teléfono, torre y apartamento para solicitar el acceso.",
         },
         { status: 400 },
       );
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
 
     if (unitResult.error || !unitResult.data?.id) {
       return NextResponse.json(
-        { error: "No fue posible ubicar la unidad para la solicitud de acceso." },
+        { error: "No fue posible ubicar el apartamento para la solicitud de acceso." },
         { status: 500 },
       );
     }
@@ -193,7 +193,7 @@ export async function POST(request: Request) {
     await adminClient.from("operations").insert({
       property_id: propertyId,
       title: "Solicitud de acceso",
-      note: `${fullName} solicitó acceso para ${tower} ${unitCode}. Método: ${preferredProvider}. Correo: ${email}.`,
+      note: `${fullName} solicitó acceso para ${tower} apartamento ${unitCode}. Método: ${preferredProvider}. Correo: ${email}.`,
       priority: "medium",
       icon: "person_add",
       status: "open",

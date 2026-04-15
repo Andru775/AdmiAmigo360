@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
     if (!fullName || !tower || !unitCode || !phone) {
       return NextResponse.json(
-        { error: "Completa nombre, torre, unidad y teléfono para continuar." },
+        { error: "Completa nombre, torre, apartamento y teléfono para continuar." },
         { status: 400 },
       );
     }

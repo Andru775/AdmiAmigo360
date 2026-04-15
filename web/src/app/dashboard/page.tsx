@@ -67,7 +67,7 @@ function DashboardContent() {
             </div>
 
             <Link
-              href="/notifications"
+              href="/access-requests"
               className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.15rem] border border-[var(--app-card-border)] bg-white text-[var(--app-heading)] shadow-[0_10px_22px_rgba(93,64,55,0.06)]"
             >
               <Icon name="notifications" className="text-[1.2rem]" />
@@ -150,11 +150,11 @@ function DashboardContent() {
                 Registrar pago
               </Link>
               <Link
-                href="/residents/new"
+                href="/access-requests"
                 className="app-button-secondary flex h-[3.8rem] items-center justify-center gap-2 rounded-[1rem] px-4 text-[0.95rem] font-semibold"
               >
                 <Icon name="person_add" className="text-[1rem]" />
-                Nuevo residente
+                Solicitudes
               </Link>
             </div>
           </GlassCard>

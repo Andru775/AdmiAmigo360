@@ -297,13 +297,13 @@ export default function SupportPage() {
 
                 <label className="block">
                   <span className="mb-2 block text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
-                    Unidad
+                    Apartamento
                   </span>
                   <input
                     value={unitCode}
                     onChange={(event) => setUnitCode(event.target.value.toUpperCase())}
                     className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                    placeholder="12B"
+                    placeholder="402"
                   />
                 </label>
               </div>
