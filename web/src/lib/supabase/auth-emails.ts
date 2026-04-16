@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import nodemailer from "nodemailer";
 
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { assertSupabaseConfigured } from "@/lib/supabase/env";
@@ -29,13 +30,50 @@ type TransactionalEmailPayload = {
   text: string;
 };
 
-function getTransactionalEmailConfig() {
+function getResendEmailConfig() {
   const apiKey = process.env.RESEND_API_KEY?.trim() ?? "";
   const from = process.env.APP_EMAIL_FROM?.trim() ?? "";
 
   return {
     isConfigured: Boolean(apiKey && from),
     apiKey,
+    from,
+  };
+}
+
+function parseBoolean(value: string | undefined, fallback: boolean) {
+  if (!value) {
+    return fallback;
+  }
+
+  const normalized = value.trim().toLowerCase();
+
+  if (["true", "1", "yes", "on"].includes(normalized)) {
+    return true;
+  }
+
+  if (["false", "0", "no", "off"].includes(normalized)) {
+    return false;
+  }
+
+  return fallback;
+}
+
+function getSmtpEmailConfig() {
+  const user = process.env.SMTP_USER?.trim() ?? "";
+  const pass = process.env.SMTP_PASS?.trim() ?? "";
+  const host = process.env.SMTP_HOST?.trim() || "smtp.gmail.com";
+  const port = Number(process.env.SMTP_PORT?.trim() || "465");
+  const secure = parseBoolean(process.env.SMTP_SECURE, port === 465);
+  const from = process.env.APP_EMAIL_FROM?.trim() || user;
+
+  return {
+    isConfigured: Boolean(user && pass && from),
+    user,
+    pass,
+    host,
+    port,
+    secure,
     from,
   };
 }
@@ -50,7 +88,56 @@ function escapeHtml(value: string) {
 }
 
 async function sendTransactionalEmail(payload: TransactionalEmailPayload) {
-  const config = getTransactionalEmailConfig();
+  const smtpConfig = getSmtpEmailConfig();
+
+  if (smtpConfig.isConfigured) {
+    try {
+      const transport = nodemailer.createTransport({
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        secure: smtpConfig.secure,
+        auth: {
+          user: smtpConfig.user,
+          pass: smtpConfig.pass,
+        },
+      });
+
+      await transport.sendMail({
+        from: smtpConfig.from,
+        to: payload.to,
+        subject: payload.subject,
+        html: payload.html,
+        text: payload.text,
+      });
+
+      return {
+        sent: true,
+        skipped: false,
+        error: null as Error | null,
+      };
+    } catch (error) {
+      const resendFallback = await sendTransactionalEmailWithResend(payload);
+
+      if (resendFallback.sent) {
+        return resendFallback;
+      }
+
+      return {
+        sent: false,
+        skipped: false,
+        error:
+          error instanceof Error
+            ? error
+            : new Error("No fue posible enviar el correo por SMTP."),
+      };
+    }
+  }
+
+  return sendTransactionalEmailWithResend(payload);
+}
+
+async function sendTransactionalEmailWithResend(payload: TransactionalEmailPayload) {
+  const config = getResendEmailConfig();
 
   if (!config.isConfigured) {
     return {
@@ -106,9 +193,10 @@ export async function sendAccountActivationEmail(
   fullName: string,
   redirectTo: string,
 ) {
-  const config = getTransactionalEmailConfig();
+  const smtpConfig = getSmtpEmailConfig();
+  const resendConfig = getResendEmailConfig();
 
-  if (!config.isConfigured) {
+  if (!smtpConfig.isConfigured && !resendConfig.isConfigured) {
     const fallback = await sendPasswordResetEmail(email, redirectTo);
     return {
       sent: !fallback.error,
