@@ -253,14 +253,14 @@ export async function fetchResidentsDirectory() {
     });
 
     if (!response.ok) {
-      return demoResidents;
+      throw new Error("No fue posible cargar residentes.");
     }
 
     const result = (await response.json()) as { residents?: Record<string, unknown>[] };
     const data = result.residents ?? [];
 
     if (!data.length) {
-      return demoResidents;
+      return [];
     }
 
     return [...data]
@@ -546,6 +546,24 @@ export async function createResident(payload: CreateResidentPayload) {
 
   if (!response.ok) {
     throw new Error(String(result.error ?? "No fue posible crear el residente."));
+  }
+
+  clearAppDataCache();
+  return result;
+}
+
+export async function deleteResident(residentId: string) {
+  const headers = await getAuthenticatedHeaders();
+  const response = await fetch(`/api/admin/residents/${residentId}`, {
+    method: "DELETE",
+    headers,
+    credentials: "include",
+  });
+
+  const result = (await response.json()) as Record<string, unknown>;
+
+  if (!response.ok) {
+    throw new Error(String(result.error ?? "No fue posible eliminar el residente."));
   }
 
   clearAppDataCache();

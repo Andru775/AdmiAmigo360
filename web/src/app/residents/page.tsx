@@ -10,7 +10,7 @@ import { RoleGate } from "@/components/app/RoleGate";
 import { SceneArt } from "@/components/app/SceneArt";
 import { StitchTabBar } from "@/components/app/StitchTabBar";
 import type { ResidentProfile } from "@/data/demoDb";
-import { fetchResidentsDirectory } from "@/lib/app-data";
+import { deleteResident, fetchResidentsDirectory } from "@/lib/app-data";
 
 const filters = ["Todas", "Propietarios", "Inquilinos", "En mora"] as const;
 
@@ -19,23 +19,73 @@ function ResidentsContent() {
   const [filter, setFilter] = useState<(typeof filters)[number]>("Todas");
   const [residents, setResidents] = useState<ResidentProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    let active = true;
+    let isActive = true;
 
-    void fetchResidentsDirectory().then((result) => {
-      if (!active) {
-        return;
-      }
+    const timer = window.setTimeout(() => {
+      setLoading(true);
+      setError("");
 
-      setResidents(result);
-      setLoading(false);
-    });
+      void fetchResidentsDirectory()
+        .then((result) => {
+          if (isActive) {
+            setResidents(result);
+          }
+        })
+        .catch((loadError: unknown) => {
+          if (isActive) {
+            setError(
+              loadError instanceof Error
+                ? loadError.message
+                : "No fue posible cargar residentes.",
+            );
+          }
+        })
+        .finally(() => {
+          if (isActive) {
+            setLoading(false);
+          }
+        });
+    }, 0);
 
     return () => {
-      active = false;
+      isActive = false;
+      window.clearTimeout(timer);
     };
   }, []);
+
+  async function handleDeleteResident(resident: ResidentProfile) {
+    const confirmed = window.confirm(
+      `¿Eliminar la cuenta de ${resident.name} de ${resident.unitLabel}? Esta acción elimina su acceso como residente.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingId(resident.id);
+    setMessage("");
+    setError("");
+
+    try {
+      await deleteResident(resident.id);
+      setMessage(`Eliminamos la cuenta de ${resident.name}.`);
+      const result = await fetchResidentsDirectory();
+      setResidents(result);
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "No fue posible eliminar el residente.",
+      );
+    } finally {
+      setDeletingId("");
+    }
+  }
 
   const filteredResidents = useMemo(() => {
     const normalized = search.trim().toLowerCase();
@@ -65,11 +115,20 @@ function ResidentsContent() {
     return { total, overdue, current };
   }, [residents]);
 
-  const groupedSections = useMemo(() => {
-    const map = new Map<string, { title: string; residents: ResidentProfile[]; accent: "gold" | "violet" }>();
+  const unitSections = useMemo(() => {
+    const map = new Map<
+      string,
+      {
+        title: string;
+        tower: string;
+        unitCode: string;
+        residents: ResidentProfile[];
+        accent: "gold" | "violet";
+      }
+    >();
 
     filteredResidents.forEach((resident) => {
-      const key = `${resident.tower}|${resident.levelLabel}`;
+      const key = `${resident.tower}|${resident.unitCode}`;
       const current = map.get(key);
 
       if (current) {
@@ -78,13 +137,22 @@ function ResidentsContent() {
       }
 
       map.set(key, {
-        title: `${resident.tower} - ${resident.levelLabel}`,
+        title: `${resident.tower} · Apartamento ${resident.unitCode}`,
+        tower: resident.tower,
+        unitCode: resident.unitCode,
         residents: [resident],
         accent: resident.accent === "gold" ? "gold" : "violet",
       });
     });
 
-    return Array.from(map.values());
+    return Array.from(map.values())
+      .map((section) => ({
+        ...section,
+        residents: [...section.residents].sort((left, right) =>
+          left.name.localeCompare(right.name),
+        ),
+      }))
+      .sort((left, right) => left.title.localeCompare(right.title));
   }, [filteredResidents]);
 
   return (
@@ -93,13 +161,13 @@ function ResidentsContent() {
         <header className="border-b border-[var(--app-card-border)] bg-[rgba(253,251,248,0.96)] px-5 pb-5 pt-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="app-kicker">Resident Directory</p>
+              <p className="app-kicker">Directorio residencial</p>
               <h1 className="app-display mt-2 text-[1.9rem] font-[680] leading-none text-[var(--app-heading)]">
                 Residentes
               </h1>
               <p className="mt-3 max-w-[18rem] text-[0.94rem] leading-6 text-[var(--app-muted)]">
-                Directorio organizado para encontrar, contactar y dar seguimiento a cada unidad
-                del conjunto.
+                Directorio organizado para encontrar, contactar y dar seguimiento a cada
+                apartamento del conjunto.
               </p>
             </div>
 
@@ -130,11 +198,11 @@ function ResidentsContent() {
             <div className="mt-5">
               <p className="app-kicker">Vista de cartera</p>
               <h2 className="app-display mt-2 text-[1.8rem] font-[680] leading-[1.02] text-[var(--app-heading)]">
-                Relacion clara entre unidades, contacto y estado de cartera
+                Relación clara entre apartamentos, residentes y estado de cartera
               </h2>
               <p className="mt-3 text-[0.94rem] leading-6 text-[var(--app-muted)]">
-                La información se organiza por sectores del conjunto y mantiene visible lo
-                importante sin que los badges ni los textos se salgan de su espacio.
+                La información se organiza por apartamentos y mantiene visible lo importante sin
+                que las etiquetas ni los textos se salgan de su espacio.
               </p>
             </div>
 
@@ -189,7 +257,7 @@ function ResidentsContent() {
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar por nombre, unidad, correo o teléfono..."
+              placeholder="Buscar por nombre, apartamento, correo o teléfono..."
               className="w-full border-none bg-transparent text-[0.98rem] text-[var(--app-heading)] outline-none"
             />
             <Icon name="tune" className="text-[1.15rem] text-[var(--app-muted)]" />
@@ -216,27 +284,41 @@ function ResidentsContent() {
           </div>
 
           <div className="mt-6 space-y-6">
+            {message ? (
+              <div className="rounded-[1rem] border border-[rgba(86,114,96,0.18)] bg-[var(--app-success-bg)] px-4 py-3 text-[0.9rem] text-[var(--app-success)]">
+                {message}
+              </div>
+            ) : null}
+
+            {error ? (
+              <div className="rounded-[1rem] border border-[rgba(161,90,73,0.18)] bg-[var(--app-danger-bg)] px-4 py-3 text-[0.9rem] text-[var(--app-danger)]">
+                {error}
+              </div>
+            ) : null}
+
             {loading ? (
               <GlassCard className="rounded-[1.6rem] p-6">
                 <p className="text-[0.95rem] text-[var(--app-muted)]">Cargando directorio...</p>
               </GlassCard>
             ) : null}
 
-            {!loading && groupedSections.length === 0 ? (
+            {!loading && unitSections.length === 0 ? (
               <GlassCard className="rounded-[1.6rem] p-6">
                 <p className="text-[0.95rem] text-[var(--app-muted)]">
-                  No encontramos residentes con ese criterio de busqueda.
+                  No encontramos residentes con ese criterio de búsqueda.
                 </p>
               </GlassCard>
             ) : null}
 
-            {groupedSections.map((section) => (
+            {unitSections.map((section) => (
               <section key={section.title} className="space-y-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <span
                       className={`h-5 w-1.5 shrink-0 rounded-full ${
-                        section.accent === "gold" ? "bg-[var(--app-secondary)]" : "bg-[var(--app-primary)]"
+                        section.accent === "gold"
+                          ? "bg-[var(--app-secondary)]"
+                          : "bg-[var(--app-primary)]"
                       }`}
                     />
                     <div className="min-w-0">
@@ -248,33 +330,47 @@ function ResidentsContent() {
                   </div>
 
                   <span className="rounded-full bg-[var(--app-surface-soft)] px-3 py-2 text-[0.72rem] font-semibold text-[var(--app-heading)]">
-                    {section.residents.length} unidades
+                    {section.residents.length} residentes
                   </span>
                 </div>
 
-                <div className="space-y-3">
-                  {section.residents.map((resident) => {
-                    const statusTone =
-                      resident.status === "paid"
-                        ? "bg-[var(--app-success-bg)] text-[var(--app-success)]"
-                        : resident.status === "overdue"
-                          ? "bg-[var(--app-danger-bg)] text-[var(--app-danger)]"
-                          : "bg-[#FAF2E5] text-[#9E7B42]";
+                <GlassCard className="rounded-[1.8rem] p-4">
+                  <div className="flex items-center gap-3 border-b border-[var(--app-card-border)] pb-4">
+                    <div
+                      className={`flex h-[3.5rem] w-[3.5rem] shrink-0 items-center justify-center rounded-[1.1rem] text-[1rem] font-semibold ${
+                        section.accent === "gold"
+                          ? "bg-[#FAF2E5] text-[#9E7B42]"
+                          : "bg-[var(--app-primary-soft)] text-[var(--app-primary)]"
+                      }`}
+                    >
+                      {section.unitCode}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[1rem] font-semibold text-[var(--app-heading)]">
+                        {section.tower} · Apartamento {section.unitCode}
+                      </p>
+                      <p className="mt-1 text-[0.84rem] text-[var(--app-muted)]">
+                        {section.residents.length === 1
+                          ? "1 residente vinculado"
+                          : `${section.residents.length} residentes vinculados`}
+                      </p>
+                    </div>
+                  </div>
 
-                    const unitTone =
-                      resident.accent === "gold"
-                        ? "bg-[#FAF2E5] text-[#9E7B42]"
-                        : "bg-[var(--app-primary-soft)] text-[var(--app-primary)]";
+                  <div className="mt-4 space-y-3">
+                    {section.residents.map((resident) => {
+                      const statusTone =
+                        resident.status === "paid"
+                          ? "bg-[var(--app-success-bg)] text-[var(--app-success)]"
+                          : resident.status === "overdue"
+                            ? "bg-[var(--app-danger-bg)] text-[var(--app-danger)]"
+                            : "bg-[#FAF2E5] text-[#9E7B42]";
 
-                    return (
-                      <GlassCard key={resident.id} className="rounded-[1.6rem] p-4">
-                        <div className="grid grid-cols-[3.6rem,1fr] gap-4">
-                          <div
-                            className={`flex h-[3.6rem] w-[3.6rem] items-center justify-center rounded-[1.1rem] text-[1rem] font-semibold ${unitTone}`}
-                          >
-                            {resident.unitCode}
-                          </div>
-
+                      return (
+                        <div
+                          key={resident.id}
+                          className="rounded-[1.3rem] border border-[var(--app-card-border)] bg-white px-4 py-4"
+                        >
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-start justify-between gap-3">
                               <div className="min-w-0">
@@ -285,7 +381,9 @@ function ResidentsContent() {
                                   <span className="rounded-full bg-[var(--app-surface-soft)] px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[var(--app-heading)]">
                                     {resident.residentType}
                                   </span>
-                                  <span className={`rounded-full px-3 py-1 text-[0.72rem] font-semibold ${statusTone}`}>
+                                  <span
+                                    className={`rounded-full px-3 py-1 text-[0.72rem] font-semibold ${statusTone}`}
+                                  >
                                     {resident.status === "paid"
                                       ? "Al día"
                                       : resident.status === "overdue"
@@ -311,28 +409,37 @@ function ResidentsContent() {
                               </div>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="mt-4 grid grid-cols-2 gap-2 border-t border-[var(--app-card-border)] pt-4">
-                          <Link
-                            href={`/messages/${resident.slug}`}
-                            className="app-button-secondary flex h-11 items-center justify-center gap-2 rounded-[1rem] text-[0.92rem] font-semibold"
-                          >
-                            <Icon name="chat_bubble" className="text-[0.95rem]" />
-                            Mensaje
-                          </Link>
-                          <Link
-                            href={`/residents/${resident.slug}`}
-                            className="app-button-secondary flex h-11 items-center justify-center gap-2 rounded-[1rem] text-[0.92rem] font-semibold"
-                          >
-                            <Icon name="visibility" className="text-[0.95rem]" />
-                            Detalles
-                          </Link>
+                          <div className="mt-4 grid grid-cols-1 gap-2 border-t border-[var(--app-card-border)] pt-4 sm:grid-cols-3">
+                            <Link
+                              href={`/messages/${resident.slug}`}
+                              className="app-button-secondary flex h-11 items-center justify-center gap-2 rounded-[1rem] text-[0.92rem] font-semibold"
+                            >
+                              <Icon name="chat_bubble" className="text-[0.95rem]" />
+                              Mensaje
+                            </Link>
+                            <Link
+                              href={`/residents/${resident.slug}`}
+                              className="app-button-secondary flex h-11 items-center justify-center gap-2 rounded-[1rem] text-[0.92rem] font-semibold"
+                            >
+                              <Icon name="visibility" className="text-[0.95rem]" />
+                              Detalles
+                            </Link>
+                            <button
+                              type="button"
+                              disabled={Boolean(deletingId)}
+                              onClick={() => void handleDeleteResident(resident)}
+                              className="flex h-11 items-center justify-center gap-2 rounded-[1rem] border border-[rgba(161,90,73,0.2)] bg-[var(--app-danger-bg)] text-[0.88rem] font-semibold text-[var(--app-danger)] disabled:opacity-60"
+                            >
+                              <Icon name="delete" className="text-[0.95rem]" />
+                              {deletingId === resident.id ? "Eliminando..." : "Eliminar"}
+                            </button>
+                          </div>
                         </div>
-                      </GlassCard>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                </GlassCard>
               </section>
             ))}
           </div>
