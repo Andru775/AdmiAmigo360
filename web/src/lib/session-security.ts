@@ -40,6 +40,14 @@ export function hasPasswordActionPending() {
   return Boolean(window.localStorage.getItem(PASSWORD_ACTION_KEY));
 }
 
+export function isPasswordActionRoute() {
+  if (!canUseBrowserStorage()) {
+    return false;
+  }
+
+  return ["/create-password", "/reset-password"].includes(window.location.pathname);
+}
+
 export function setRememberSessionPreference(remember: boolean) {
   if (!canUseBrowserStorage()) {
     return;

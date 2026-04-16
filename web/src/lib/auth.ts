@@ -14,6 +14,7 @@ import {
   clearEphemeralSessionState,
   clearPasswordActionPending,
   hasPasswordActionPending,
+  isPasswordActionRoute,
   markEphemeralSessionActive,
   setRememberSessionPreference,
   shouldClearPersistentSession,
@@ -114,9 +115,24 @@ export async function resolveSupabaseSession(role?: DemoRole) {
     return null;
   }
 
-  if (hasPasswordActionPending() || shouldClearPersistentSession()) {
+  if (isPasswordActionRoute()) {
+    clearAppDataCache();
+    clearSession();
+    return null;
+  }
+
+  if (hasPasswordActionPending()) {
+    clearAppDataCache();
+    clearSession();
+
     await supabase.auth.signOut();
     clearPasswordActionPending();
+    clearEphemeralSessionState();
+    return null;
+  }
+
+  if (shouldClearPersistentSession()) {
+    await supabase.auth.signOut();
     clearEphemeralSessionState();
     clearAppDataCache();
     clearSession();

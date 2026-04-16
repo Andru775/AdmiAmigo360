@@ -242,7 +242,7 @@ export async function POST(request: Request) {
     let activationEmailSent = false;
 
     if (shouldSendActivationEmail) {
-      const redirectTo = `${new URL(request.url).origin}/create-password`;
+      const redirectTo = `${new URL(request.url).origin}/create-password?role=resident`;
       const { error: emailError } = await sendAccountActivationEmail(email, fullName, redirectTo);
 
       if (!emailError) {

@@ -175,7 +175,7 @@ export async function PATCH(
       return NextResponse.json({ error: "No fue posible activar el residente." }, { status: 500 });
     }
 
-    const redirectTo = `${new URL(request.url).origin}/create-password`;
+    const redirectTo = `${new URL(request.url).origin}/create-password?role=resident`;
     const activationEmail = await sendAccountActivationEmail(email, fullName, redirectTo);
 
     await adminClient.from("operations").insert({

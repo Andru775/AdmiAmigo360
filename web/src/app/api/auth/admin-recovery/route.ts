@@ -38,7 +38,7 @@ export async function POST(request: Request) {
         : false;
 
       if (isActiveAdmin) {
-        const redirectTo = `${new URL(request.url).origin}/reset-password`;
+        const redirectTo = `${new URL(request.url).origin}/reset-password?role=admin`;
         const resetResult = await sendPasswordResetEmail(email, redirectTo, {
           fullName:
             typeof profileResult.data?.full_name === "string"

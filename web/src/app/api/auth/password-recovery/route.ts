@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { hasActiveAccountRole, isAppRole } from "@/lib/supabase/account-roles";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendPasswordResetEmail } from "@/lib/supabase/auth-emails";
 
@@ -23,24 +24,35 @@ export async function POST(request: Request) {
     if (user?.id) {
       const profileResult = await adminClient
         .from("profiles")
-        .select("full_name")
+        .select("role, property_id, full_name")
         .eq("id", user.id)
         .maybeSingle();
 
-      const redirectTo = `${new URL(request.url).origin}/reset-password`;
-      const resetResult = await sendPasswordResetEmail(email, redirectTo, {
-        fullName:
-          typeof profileResult.data?.full_name === "string"
-            ? profileResult.data.full_name
-            : undefined,
-        accountType: "resident",
-      });
+      const profileRole = isAppRole(profileResult.data?.role) ? profileResult.data.role : undefined;
+      const propertyId =
+        typeof profileResult.data?.property_id === "string"
+          ? profileResult.data.property_id
+          : "";
+      const isActiveResident = propertyId
+        ? await hasActiveAccountRole(adminClient, user.id, propertyId, "resident", profileRole)
+        : false;
 
-      if (resetResult.error) {
-        return NextResponse.json(
-          { error: "No fue posible enviar el correo de recuperación. Intenta nuevamente." },
-          { status: 500 },
-        );
+      if (isActiveResident) {
+        const redirectTo = `${new URL(request.url).origin}/reset-password?role=resident`;
+        const resetResult = await sendPasswordResetEmail(email, redirectTo, {
+          fullName:
+            typeof profileResult.data?.full_name === "string"
+              ? profileResult.data.full_name
+              : undefined,
+          accountType: "resident",
+        });
+
+        if (resetResult.error) {
+          return NextResponse.json(
+            { error: "No fue posible enviar el correo de recuperación. Intenta nuevamente." },
+            { status: 500 },
+          );
+        }
       }
     }
 

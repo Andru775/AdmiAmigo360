@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 
@@ -63,8 +63,7 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const completedRef = useRef(false);
-  const sessionActivatedRef = useRef(false);
+  const [recoveryRole, setRecoveryRole] = useState<"resident" | "admin">("resident");
 
   const requirements = useMemo(() => getPasswordRequirements(password), [password]);
   const strengthLabel = useMemo(() => getPasswordStrengthLabel(password), [password]);
@@ -89,24 +88,22 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
     }
 
     let active = true;
-    const invalidatePendingSession = () => {
-      if (!sessionActivatedRef.current || completedRef.current) {
-        return;
-      }
-
-      clearSession();
-      void supabase.auth.signOut().finally(() => {
-        clearPasswordActionPending();
-      });
-    };
 
     const resolveRecovery = async () => {
       const url = new URL(window.location.href);
       const code = url.searchParams.get("code");
+      const roleParam = url.searchParams.get("role");
       const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
       const accessToken = hashParams.get("access_token");
       const refreshToken = hashParams.get("refresh_token");
       const hasRecoveryPayload = Boolean(code || (accessToken && refreshToken));
+      const nextRole = roleParam === "admin" ? "admin" : "resident";
+
+      setRecoveryRole(nextRole);
+
+      if (hasRecoveryPayload) {
+        markPasswordActionPending(mode);
+      }
 
       if (code) {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
@@ -121,8 +118,6 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
           return;
         }
 
-        sessionActivatedRef.current = true;
-        markPasswordActionPending(mode);
         window.history.replaceState(null, "", mode === "create" ? "/create-password" : "/reset-password");
       } else if (accessToken && refreshToken) {
         const { error: sessionError } = await supabase.auth.setSession({
@@ -140,8 +135,6 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
           return;
         }
 
-        sessionActivatedRef.current = true;
-        markPasswordActionPending(mode);
         window.history.replaceState(null, "", mode === "create" ? "/create-password" : "/reset-password");
       }
 
@@ -154,7 +147,6 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
       }
 
       if (session && (hasRecoveryPayload || hasPasswordActionPending())) {
-        sessionActivatedRef.current = true;
         setIsReady(true);
         setIsLoading(false);
         return;
@@ -181,19 +173,14 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
           return;
         }
 
-        sessionActivatedRef.current = true;
         setIsReady(true);
         setIsLoading(false);
       }
     });
 
-    window.addEventListener("pagehide", invalidatePendingSession);
-
     return () => {
       active = false;
-      window.removeEventListener("pagehide", invalidatePendingSession);
       subscription.unsubscribe();
-      invalidatePendingSession();
     };
   }, [content.invalid, mode]);
 
@@ -233,7 +220,6 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
       return;
     }
 
-    completedRef.current = true;
     clearPasswordActionPending();
     clearSession();
     await supabase.auth.signOut();
@@ -241,7 +227,8 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
     setIsSaving(false);
 
     window.setTimeout(() => {
-      router.replace(mode === "create" ? "/login?created=1" : "/login?recovered=1");
+      const statusParam = mode === "create" ? "created=1" : "recovered=1";
+      router.replace(`/login?${statusParam}&role=${recoveryRole}`);
     }, 1200);
   }
 

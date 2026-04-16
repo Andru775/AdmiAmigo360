@@ -46,6 +46,14 @@ export default function LoginPage() {
   const [oauthSubmitting, setOauthSubmitting] = useState<ResidentOAuthProvider | null>(null);
   const usingSupabase = isSupabaseConfigured();
 
+  function applyRole(nextRole: DemoRole) {
+    const defaults = roleDefaults(nextRole);
+    setRole(nextRole);
+    setEmail(defaults.email);
+    setPassword(defaults.password);
+    setError("");
+  }
+
   useEffect(() => {
     if (!isLoading && session) {
       router.replace(session.homeHref);
@@ -61,8 +69,13 @@ export default function LoginPage() {
     const recoveredFlag = params.get("recovered") === "1";
     const createdFlag = params.get("created") === "1";
     const oauthError = params.get("oauth_error");
+    const roleParam = params.get("role");
 
     const timer = window.setTimeout(() => {
+      if (roleParam === "admin" || roleParam === "resident") {
+        applyRole(roleParam);
+      }
+
       setRecovered(recoveredFlag);
       setCreated(createdFlag);
 
@@ -131,14 +144,6 @@ export default function LoginPage() {
       window.clearTimeout(timer);
     };
   }, [isLoading, router, session, usingSupabase]);
-
-  function applyRole(nextRole: DemoRole) {
-    const defaults = roleDefaults(nextRole);
-    setRole(nextRole);
-    setEmail(defaults.email);
-    setPassword(defaults.password);
-    setError("");
-  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
