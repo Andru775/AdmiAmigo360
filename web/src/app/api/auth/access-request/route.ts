@@ -28,6 +28,24 @@ function buildResidentSlug(tower: string, unitCode: string, email: string) {
     .replace(/[^a-z0-9]+/g, "-");
 }
 
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function normalizePhone(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed.startsWith("+")) {
+    return "";
+  }
+
+  return `+${trimmed.slice(1).replace(/\D/g, "")}`;
+}
+
+function isValidInternationalPhone(value: string) {
+  return /^\+[1-9]\d{7,14}$/.test(value);
+}
+
 function buildRequestNotes(
   notes: string,
   preferredProvider: string,
@@ -53,9 +71,11 @@ export async function POST(request: Request) {
     const body = (await request.json()) as Record<string, unknown>;
     const fullName = String(body.fullName ?? "").trim();
     const email = String(body.email ?? "").trim().toLowerCase();
-    const phone = String(body.phone ?? "").trim();
+    const rawPhone = String(body.phone ?? "").trim();
+    const rawUnitCode = String(body.apartmentCode ?? body.unitCode ?? "").trim();
+    const phone = normalizePhone(rawPhone);
     const tower = normalizeTower(String(body.tower ?? ""));
-    const unitCode = String(body.apartmentCode ?? body.unitCode ?? "").trim().toUpperCase();
+    const unitCode = rawUnitCode.replace(/\D/g, "");
     const levelLabel = unitCode;
     const residentType = String(body.residentType ?? "tenant");
     const preferredProvider = String(body.preferredProvider ?? "password").trim();
@@ -68,6 +88,27 @@ export async function POST(request: Request) {
           error:
             "Completa nombre, correo, teléfono, torre y apartamento para solicitar el acceso.",
         },
+        { status: 400 },
+      );
+    }
+
+    if (!isValidEmail(email)) {
+      return NextResponse.json(
+        { error: "Ingresa un correo electrónico válido." },
+        { status: 400 },
+      );
+    }
+
+    if (!/^\d{1,6}$/.test(rawUnitCode) || !/^\d{1,6}$/.test(unitCode)) {
+      return NextResponse.json(
+        { error: "El apartamento debe contener solo números." },
+        { status: 400 },
+      );
+    }
+
+    if (/[a-z]/i.test(rawPhone) || !isValidInternationalPhone(phone)) {
+      return NextResponse.json(
+        { error: "Ingresa un teléfono válido con indicativo de país." },
         { status: 400 },
       );
     }

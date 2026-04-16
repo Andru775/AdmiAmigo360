@@ -9,6 +9,14 @@ import { HeaderBar } from "@/components/app/HeaderBar";
 import { Icon } from "@/components/app/Icon";
 
 const towerOptions = ["Torre A", "Torre B", "Torre C", "Torre D"] as const;
+const countryOptions = [
+  { code: "+57", label: "Colombia" },
+  { code: "+1", label: "Estados Unidos" },
+  { code: "+52", label: "México" },
+  { code: "+51", label: "Perú" },
+  { code: "+56", label: "Chile" },
+  { code: "+34", label: "España" },
+] as const;
 
 type ApiResult = {
   requested?: boolean;
@@ -19,6 +27,7 @@ type ApiResult = {
 const initialRequestState = {
   fullName: "",
   email: "",
+  phoneCountry: "+57",
   phone: "",
   tower: "Torre A",
   apartmentCode: "",
@@ -55,6 +64,10 @@ export default function RequestAccessPage() {
     setRequestForm((current) => ({ ...current, [field]: value }));
   }
 
+  function updateDigitsField(field: "phone" | "apartmentCode", value: string) {
+    updateRequestField(field, value.replace(/\D/g, ""));
+  }
+
   async function handleAccessRequest(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setRequestLoading(true);
@@ -68,7 +81,8 @@ export default function RequestAccessPage() {
         },
         body: JSON.stringify({
           ...requestForm,
-          apartmentCode: requestForm.apartmentCode.toUpperCase(),
+          apartmentCode: requestForm.apartmentCode,
+          phone: `${requestForm.phoneCountry}${requestForm.phone}`,
           propertyCode: "admiamigo-360",
         }),
       });
@@ -158,12 +172,28 @@ export default function RequestAccessPage() {
               <span className="mb-2 block text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
                 Teléfono
               </span>
-              <input
-                value={requestForm.phone}
-                onChange={(event) => updateRequestField("phone", event.target.value)}
-                className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                placeholder="+57 300 000 0000"
-              />
+              <div className="grid grid-cols-[7.8rem_1fr] gap-2">
+                <select
+                  value={requestForm.phoneCountry}
+                  onChange={(event) => updateRequestField("phoneCountry", event.target.value)}
+                  className="app-input h-[3.8rem] w-full rounded-[1rem] px-3 text-[0.9rem] outline-none"
+                  aria-label="Indicativo del país"
+                >
+                  {countryOptions.map((option) => (
+                    <option key={option.code} value={option.code}>
+                      {option.code} {option.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  value={requestForm.phone}
+                  onChange={(event) => updateDigitsField("phone", event.target.value)}
+                  className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
+                  placeholder="3000000000"
+                />
+              </div>
             </label>
           </div>
 
@@ -190,8 +220,10 @@ export default function RequestAccessPage() {
                 Apartamento
               </span>
               <input
+                type="text"
+                inputMode="numeric"
                 value={requestForm.apartmentCode}
-                onChange={(event) => updateRequestField("apartmentCode", event.target.value.toUpperCase())}
+                onChange={(event) => updateDigitsField("apartmentCode", event.target.value)}
                 className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
                 placeholder="402"
               />

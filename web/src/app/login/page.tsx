@@ -38,6 +38,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState(roleDefaults("resident").email);
   const [password, setPassword] = useState(roleDefaults("resident").password);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberSession, setRememberSession] = useState(true);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [recovered, setRecovered] = useState(false);
@@ -144,7 +145,7 @@ export default function LoginPage() {
     setSubmitting(true);
     setError("");
 
-    const result = await loginWithPassword(role, email, password);
+    const result = await loginWithPassword(role, email, password, rememberSession);
 
     if (result.error || !result.session) {
       setError(result.error ?? "No se pudo iniciar sesión.");
@@ -159,7 +160,7 @@ export default function LoginPage() {
     setOauthSubmitting(provider);
     setError("");
 
-    const result = await loginWithOAuth(provider);
+    const result = await loginWithOAuth(provider, rememberSession);
 
     if (result.error) {
       setError(
@@ -242,7 +243,7 @@ export default function LoginPage() {
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    placeholder="nombre@conjunto.com"
+                    placeholder="nombre@gmail.com"
                     className="w-full border-none bg-transparent text-[1rem] outline-none"
                   />
                 </div>
@@ -280,6 +281,18 @@ export default function LoginPage() {
                     <Icon name="visibility" className="text-[1.15rem]" />
                   </button>
                 </div>
+              </label>
+
+              <label className="flex items-start gap-3 rounded-[1rem] border border-[var(--app-card-border)] bg-[var(--app-surface-soft)] px-4 py-3">
+                <input
+                  type="checkbox"
+                  checked={rememberSession}
+                  onChange={(event) => setRememberSession(event.target.checked)}
+                  className="mt-1 h-4 w-4 accent-[var(--app-primary)]"
+                />
+                <span className="text-[0.85rem] leading-5 text-[var(--app-muted)]">
+                  Mantener la sesión iniciada en este dispositivo.
+                </span>
               </label>
 
               <button

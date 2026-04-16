@@ -138,6 +138,10 @@ export default function SupportPage() {
     }
   }
 
+  function updatePhone(value: string) {
+    setPhone(value.replace(/\D/g, ""));
+  }
+
   return (
     <AppScreen
       requireAuth={false}
@@ -201,7 +205,7 @@ export default function SupportPage() {
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    placeholder="nombre@conjunto.com"
+                    placeholder="nombre@gmail.com"
                     className="w-full border-none bg-transparent text-[1rem] outline-none"
                   />
                 </div>
@@ -291,10 +295,12 @@ export default function SupportPage() {
                   Teléfono
                 </span>
                 <input
+                  type="tel"
+                  inputMode="numeric"
                   value={phone}
-                  onChange={(event) => setPhone(event.target.value)}
+                  onChange={(event) => updatePhone(event.target.value)}
                   className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                  placeholder="+57 300 000 0000"
+                  placeholder="3000000000"
                 />
               </label>
 

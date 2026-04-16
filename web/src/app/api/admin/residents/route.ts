@@ -9,6 +9,28 @@ function residentSlugFromUnit(tower: string, unitCode: string, email: string) {
   return `${tower}-${unitCode}-${email}`.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
 
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function normalizePhone(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return "";
+  }
+
+  if (!trimmed.startsWith("+")) {
+    return "";
+  }
+
+  return `+${trimmed.slice(1).replace(/\D/g, "")}`;
+}
+
+function isValidInternationalPhone(value: string) {
+  return !value || /^\+[1-9]\d{7,14}$/.test(value);
+}
+
 export async function GET(request: Request) {
   try {
     const context = await getRequestContext(request, "admin");
@@ -62,17 +84,34 @@ export async function POST(request: Request) {
     const body = (await request.json()) as Record<string, unknown>;
     const fullName = String(body.fullName ?? "").trim();
     const email = String(body.email ?? "").trim().toLowerCase();
-    const phone = String(body.phone ?? "").trim();
+    const rawPhone = String(body.phone ?? "").trim();
+    const rawUnitCode = String(body.unitCode ?? "").trim();
+    const phone = normalizePhone(rawPhone);
     const tower = String(body.tower ?? "").trim();
     const levelLabel = String(body.levelLabel ?? "").trim();
-    const unitCode = String(body.unitCode ?? "").trim().toUpperCase();
+    const unitCode = rawUnitCode.replace(/\D/g, "");
     const residentType = String(body.residentType ?? "tenant");
     const notes = String(body.notes ?? "").trim();
     const password = String(body.password ?? "").trim();
     const balance = Number(body.balance ?? 0);
 
     if (!fullName || !email || !tower || !levelLabel || !unitCode) {
-      return NextResponse.json({ error: "Completa nombre, correo, torre, nivel y unidad." }, { status: 400 });
+      return NextResponse.json({ error: "Completa nombre, correo, torre y apartamento." }, { status: 400 });
+    }
+
+    if (!isValidEmail(email)) {
+      return NextResponse.json({ error: "Ingresa un correo electrónico válido." }, { status: 400 });
+    }
+
+    if (!/^\d{1,6}$/.test(rawUnitCode) || !/^\d{1,6}$/.test(unitCode)) {
+      return NextResponse.json({ error: "El apartamento debe contener solo números." }, { status: 400 });
+    }
+
+    if (/[a-z]/i.test(rawPhone) || !isValidInternationalPhone(phone)) {
+      return NextResponse.json(
+        { error: "Ingresa un teléfono válido con indicativo de país." },
+        { status: 400 },
+      );
     }
 
     const unitUpsert = await adminClient

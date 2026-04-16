@@ -86,7 +86,7 @@ export default function AdminRecoveryPage() {
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    placeholder="admin@conjunto.com"
+                    placeholder="administrador@gmail.com"
                     className="w-full border-none bg-transparent text-[1rem] outline-none"
                   />
                 </div>

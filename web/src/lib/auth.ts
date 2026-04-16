@@ -10,6 +10,14 @@ import {
   storeSession,
   type SessionUser,
 } from "@/lib/demoAuth";
+import {
+  clearEphemeralSessionState,
+  clearPasswordActionPending,
+  hasPasswordActionPending,
+  markEphemeralSessionActive,
+  setRememberSessionPreference,
+  shouldClearPersistentSession,
+} from "@/lib/session-security";
 import { getSupabaseAccessToken, getSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -94,12 +102,24 @@ async function buildSupabaseSession(role?: DemoRole) {
   }
 
   storeSession(session);
+  markEphemeralSessionActive();
   clearPreferredRole();
   return session;
 }
 
 export async function resolveSupabaseSession(role?: DemoRole) {
-  if (!getSupabaseBrowserClient()) {
+  const supabase = getSupabaseBrowserClient();
+
+  if (!supabase) {
+    return null;
+  }
+
+  if (hasPasswordActionPending() || shouldClearPersistentSession()) {
+    await supabase.auth.signOut();
+    clearPasswordActionPending();
+    clearEphemeralSessionState();
+    clearAppDataCache();
+    clearSession();
     return null;
   }
 
@@ -113,10 +133,16 @@ export async function resolveSupabaseSession(role?: DemoRole) {
   return session;
 }
 
-export async function loginWithPassword(role: DemoRole, email: string, password: string) {
+export async function loginWithPassword(
+  role: DemoRole,
+  email: string,
+  password: string,
+  rememberSession = true,
+) {
   const normalizedEmail = email.trim().toLowerCase();
   const normalizedPassword = password.trim();
   storePreferredRole(role);
+  setRememberSessionPreference(rememberSession);
 
   if (!normalizedEmail || !normalizedPassword) {
     return {
@@ -183,10 +209,12 @@ export async function loginWithPassword(role: DemoRole, email: string, password:
     };
   }
 
+  markEphemeralSessionActive();
+
   return { session, mode: "supabase" as const };
 }
 
-export async function loginWithOAuth(provider: ResidentOAuthProvider) {
+export async function loginWithOAuth(provider: ResidentOAuthProvider, rememberSession = true) {
   if (!isSupabaseConfigured()) {
     return {
       error: "Activa Supabase para usar accesos con Google o Microsoft.",
@@ -209,6 +237,7 @@ export async function loginWithOAuth(provider: ResidentOAuthProvider) {
 
   const redirectTo = `${window.location.origin}/auth/callback?next=/login&oauth=1`;
   const scopes = provider === "azure" ? "email" : undefined;
+  setRememberSessionPreference(rememberSession);
   storePreferredRole("resident");
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
@@ -232,6 +261,8 @@ export async function logoutApp() {
   }
 
   clearPreferredRole();
+  clearEphemeralSessionState();
+  clearPasswordActionPending();
   clearAppDataCache();
   clearSession();
 }

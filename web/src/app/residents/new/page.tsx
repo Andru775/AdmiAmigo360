@@ -11,9 +11,19 @@ import { SceneArt } from "@/components/app/SceneArt";
 import { RoleGate } from "@/components/app/RoleGate";
 import { createResident } from "@/lib/app-data";
 
+const countryOptions = [
+  { code: "+57", label: "Colombia" },
+  { code: "+1", label: "Estados Unidos" },
+  { code: "+52", label: "México" },
+  { code: "+51", label: "Perú" },
+  { code: "+56", label: "Chile" },
+  { code: "+34", label: "España" },
+] as const;
+
 const initialState = {
   fullName: "",
   email: "",
+  phoneCountry: "+57",
   phone: "",
   tower: "Torre A",
   levelLabel: "Nivel 12",
@@ -39,6 +49,10 @@ function NewResidentContent() {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
+  function updateDigitsField(field: "phone" | "unitCode", value: string) {
+    updateField(field, value.replace(/\D/g, ""));
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
@@ -49,9 +63,9 @@ function NewResidentContent() {
       const result = await createResident({
         fullName: form.fullName,
         email: form.email,
-        phone: form.phone,
+        phone: form.phone ? `${form.phoneCountry}${form.phone}` : "",
         tower: form.tower,
-        levelLabel: form.levelLabel,
+        levelLabel: form.unitCode ? `Apartamento ${form.unitCode}` : form.levelLabel,
         unitCode: form.unitCode,
         residentType: form.residentType === "owner" ? "owner" : "tenant",
         balance: Number(form.balance),
@@ -142,51 +156,55 @@ function NewResidentContent() {
               <span className="mb-2 block text-[0.74rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
                 Teléfono
               </span>
-              <input
-                value={form.phone}
-                onChange={(event) => updateField("phone", event.target.value)}
-                className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                placeholder="+57 300 000 0000"
-              />
+              <div className="grid grid-cols-[7.8rem_1fr] gap-2">
+                <select
+                  value={form.phoneCountry}
+                  onChange={(event) => updateField("phoneCountry", event.target.value)}
+                  className="app-input h-[3.8rem] w-full rounded-[1rem] px-3 text-[0.9rem] outline-none"
+                  aria-label="Indicativo del país"
+                >
+                  {countryOptions.map((option) => (
+                    <option key={option.code} value={option.code}>
+                      {option.code} {option.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  value={form.phone}
+                  onChange={(event) => updateDigitsField("phone", event.target.value)}
+                  className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
+                  placeholder="3000000000"
+                />
+              </div>
             </label>
           </div>
+
+          <label className="block">
+            <span className="mb-2 block text-[0.74rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
+              Torre
+            </span>
+            <input
+              value={form.tower}
+              onChange={(event) => updateField("tower", event.target.value)}
+              className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
+              placeholder="Torre A"
+            />
+          </label>
 
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
               <span className="mb-2 block text-[0.74rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
-                Torre
+                Apartamento
               </span>
               <input
-                value={form.tower}
-                onChange={(event) => updateField("tower", event.target.value)}
-                className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                placeholder="Torre A"
-              />
-            </label>
-
-            <label className="block">
-              <span className="mb-2 block text-[0.74rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
-                Nivel
-              </span>
-              <input
-                value={form.levelLabel}
-                onChange={(event) => updateField("levelLabel", event.target.value)}
-                className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                placeholder="Nivel 12"
-              />
-            </label>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <label className="block">
-              <span className="mb-2 block text-[0.74rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
-                Unidad
-              </span>
-              <input
+                type="text"
+                inputMode="numeric"
                 value={form.unitCode}
-                onChange={(event) => updateField("unitCode", event.target.value.toUpperCase())}
+                onChange={(event) => updateDigitsField("unitCode", event.target.value)}
                 className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                placeholder="12B"
+                placeholder="402"
               />
             </label>
 

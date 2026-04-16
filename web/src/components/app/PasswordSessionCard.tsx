@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 
@@ -13,6 +13,12 @@ import {
   getPasswordStrengthLabel,
   validatePassword,
 } from "@/lib/password-policy";
+import { clearSession } from "@/lib/demoAuth";
+import {
+  clearPasswordActionPending,
+  hasPasswordActionPending,
+  markPasswordActionPending,
+} from "@/lib/session-security";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type PasswordSessionCardProps = {
@@ -57,6 +63,8 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const completedRef = useRef(false);
+  const sessionActivatedRef = useRef(false);
 
   const requirements = useMemo(() => getPasswordRequirements(password), [password]);
   const strengthLabel = useMemo(() => getPasswordStrengthLabel(password), [password]);
@@ -81,6 +89,16 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
     }
 
     let active = true;
+    const invalidatePendingSession = () => {
+      if (!sessionActivatedRef.current || completedRef.current) {
+        return;
+      }
+
+      clearSession();
+      void supabase.auth.signOut().finally(() => {
+        clearPasswordActionPending();
+      });
+    };
 
     const resolveRecovery = async () => {
       const url = new URL(window.location.href);
@@ -88,6 +106,7 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
       const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
       const accessToken = hashParams.get("access_token");
       const refreshToken = hashParams.get("refresh_token");
+      const hasRecoveryPayload = Boolean(code || (accessToken && refreshToken));
 
       if (code) {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
@@ -102,6 +121,8 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
           return;
         }
 
+        sessionActivatedRef.current = true;
+        markPasswordActionPending(mode);
         window.history.replaceState(null, "", mode === "create" ? "/create-password" : "/reset-password");
       } else if (accessToken && refreshToken) {
         const { error: sessionError } = await supabase.auth.setSession({
@@ -119,6 +140,8 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
           return;
         }
 
+        sessionActivatedRef.current = true;
+        markPasswordActionPending(mode);
         window.history.replaceState(null, "", mode === "create" ? "/create-password" : "/reset-password");
       }
 
@@ -130,7 +153,8 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
         return;
       }
 
-      if (session) {
+      if (session && (hasRecoveryPayload || hasPasswordActionPending())) {
+        sessionActivatedRef.current = true;
         setIsReady(true);
         setIsLoading(false);
         return;
@@ -149,14 +173,27 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
       }
 
       if (event === "PASSWORD_RECOVERY" || Boolean(session)) {
+        if (event === "PASSWORD_RECOVERY") {
+          markPasswordActionPending(mode);
+        }
+
+        if (!hasPasswordActionPending() && event !== "PASSWORD_RECOVERY") {
+          return;
+        }
+
+        sessionActivatedRef.current = true;
         setIsReady(true);
         setIsLoading(false);
       }
     });
 
+    window.addEventListener("pagehide", invalidatePendingSession);
+
     return () => {
       active = false;
+      window.removeEventListener("pagehide", invalidatePendingSession);
       subscription.unsubscribe();
+      invalidatePendingSession();
     };
   }, [content.invalid, mode]);
 
@@ -196,6 +233,10 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
       return;
     }
 
+    completedRef.current = true;
+    clearPasswordActionPending();
+    clearSession();
+    await supabase.auth.signOut();
     setSuccess(content.success);
     setIsSaving(false);
 
