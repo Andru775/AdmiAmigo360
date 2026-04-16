@@ -117,12 +117,23 @@ function AccessRequestsContent() {
 
   useEffect(() => {
     void loadRequests(false);
+
     const timer = window.setInterval(() => {
-      void loadRequests(true);
+      if (document.visibilityState === "visible") {
+        void loadRequests(true);
+      }
     }, 60000);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void loadRequests(true);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 

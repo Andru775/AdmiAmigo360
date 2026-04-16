@@ -73,14 +73,11 @@ export function PasswordSessionCard({ mode }: PasswordSessionCardProps) {
     const supabase = getSupabaseBrowserClient();
 
     if (!supabase) {
-      const timer = window.setTimeout(() => {
+      void Promise.resolve().then(() => {
         setError("No fue posible preparar el cambio de contraseña.");
         setIsLoading(false);
-      }, 0);
-
-      return () => {
-        window.clearTimeout(timer);
-      };
+      });
+      return;
     }
 
     if (typeof window === "undefined") {

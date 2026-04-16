@@ -71,7 +71,7 @@ export default function LoginPage() {
     const oauthError = params.get("oauth_error");
     const roleParam = params.get("role");
 
-    const timer = window.setTimeout(() => {
+    void Promise.resolve().then(() => {
       if (roleParam === "admin" || roleParam === "resident") {
         applyRole(roleParam);
       }
@@ -84,11 +84,7 @@ export default function LoginPage() {
           "No fue posible completar el acceso con el proveedor seleccionado. Revisa la configuración de Google o Microsoft en Supabase.",
         );
       }
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
+    });
   }, []);
 
   useEffect(() => {

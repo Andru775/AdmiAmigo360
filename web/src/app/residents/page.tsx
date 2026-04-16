@@ -26,35 +26,32 @@ function ResidentsContent() {
   useEffect(() => {
     let isActive = true;
 
-    const timer = window.setTimeout(() => {
-      setLoading(true);
-      setError("");
+    setLoading(true);
+    setError("");
 
-      void fetchResidentsDirectory()
-        .then((result) => {
-          if (isActive) {
-            setResidents(result);
-          }
-        })
-        .catch((loadError: unknown) => {
-          if (isActive) {
-            setError(
-              loadError instanceof Error
-                ? loadError.message
-                : "No fue posible cargar residentes.",
-            );
-          }
-        })
-        .finally(() => {
-          if (isActive) {
-            setLoading(false);
-          }
-        });
-    }, 0);
+    void fetchResidentsDirectory()
+      .then((result) => {
+        if (isActive) {
+          setResidents(result);
+        }
+      })
+      .catch((loadError: unknown) => {
+        if (isActive) {
+          setError(
+            loadError instanceof Error
+              ? loadError.message
+              : "No fue posible cargar residentes.",
+          );
+        }
+      })
+      .finally(() => {
+        if (isActive) {
+          setLoading(false);
+        }
+      });
 
     return () => {
       isActive = false;
-      window.clearTimeout(timer);
     };
   }, []);
 

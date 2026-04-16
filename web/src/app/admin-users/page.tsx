@@ -71,13 +71,7 @@ function AdminUsersContent() {
   }
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void loadAdmins();
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
+    void Promise.resolve().then(() => loadAdmins());
   }, []);
 
   async function handleCreate(event: React.FormEvent<HTMLFormElement>) {
