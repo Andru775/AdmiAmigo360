@@ -183,6 +183,43 @@ input::placeholder {
   color: var(--app-heading);
 }
 
+.app-tabbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+  box-shadow: 0 -10px 24px rgba(71, 51, 41, 0.06);
+}
+
+.app-tabbar-link {
+  min-height: 4rem;
+  color: var(--app-primary);
+}
+
+.app-tabbar-link-active {
+  background: var(--app-primary);
+  color: #fff !important;
+  box-shadow: 0 14px 24px rgba(79, 56, 47, 0.16);
+}
+
+.app-tabbar-link-active svg,
+.app-tabbar-link-active span {
+  color: #fff !important;
+}
+
+.app-tabbar-fab {
+  box-shadow: 0 12px 24px rgba(122, 95, 65, 0.2);
+}
+
+.app-tabbar-fab-gold {
+  background: radial-gradient(circle at 30% 30%, #f0deba, #c7a061 56%, #8a6a4a 100%);
+  color: #2f241e;
+}
+
+.app-tabbar-fab-primary {
+  background: radial-gradient(circle at 30% 30%, #ceb3a1, #8f7569 56%, #4f382f 100%);
+  color: #fff;
+}
+
 .app-figure {
   border: 1px solid rgba(191, 157, 108, 0.2);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 247, 238, 0.96));

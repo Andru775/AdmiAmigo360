@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { AppViewport } from "@/components/app/AppViewport";
+import { BottomNav } from "@/components/app/BottomNav";
 import { GlassCard } from "@/components/app/GlassCard";
 import { Icon } from "@/components/app/Icon";
 import { RoleGate } from "@/components/app/RoleGate";
 import { SceneArt } from "@/components/app/SceneArt";
-import { StitchTabBar } from "@/components/app/StitchTabBar";
 import type { ResidentProfile } from "@/data/demoDb";
 import { deleteResident, fetchResidentsDirectory } from "@/lib/app-data";
 
@@ -442,15 +442,7 @@ function ResidentsContent() {
           </div>
         </main>
 
-        <StitchTabBar
-          items={[
-            { label: "Panel", href: "/dashboard", icon: "dashboard" },
-            { label: "Residentes", href: "/residents", icon: "group", active: true },
-            { label: "Nuevo", href: "/residents/new", icon: "person_add", variant: "fab", tone: "gold" },
-            { label: "Pagos", href: "/payments", icon: "payments" },
-            { label: "Cuenta", href: "/settings", icon: "settings" },
-          ]}
-        />
+        <BottomNav current="residents" />
       </div>
     </AppViewport>
   );

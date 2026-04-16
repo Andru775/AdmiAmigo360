@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { AppViewport } from "@/components/app/AppViewport";
+import { BottomNav } from "@/components/app/BottomNav";
 import { GlassCard } from "@/components/app/GlassCard";
 import { Icon } from "@/components/app/Icon";
 import { RoleGate } from "@/components/app/RoleGate";
 import { SceneArt } from "@/components/app/SceneArt";
-import { StitchTabBar } from "@/components/app/StitchTabBar";
 import { fetchPaymentsOverview, summarizeMonthlyCollection, type PaymentsOverview } from "@/lib/app-data";
 
 function PaymentsContent() {
@@ -226,15 +226,7 @@ function PaymentsContent() {
           </section>
         </main>
 
-        <StitchTabBar
-          items={[
-            { label: "Panel", href: "/dashboard", icon: "dashboard" },
-            { label: "Residentes", href: "/residents", icon: "group" },
-            { label: "Nuevo", href: "/payments/register", icon: "add_card", variant: "fab", tone: "gold" },
-            { label: "Pagos", href: "/payments", icon: "payments", active: true },
-            { label: "Cuenta", href: "/settings", icon: "settings" },
-          ]}
-        />
+        <BottomNav current="payments" />
       </div>
     </AppViewport>
   );

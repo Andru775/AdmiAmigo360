@@ -58,6 +58,7 @@ export function ResidentShell({
               label: "Reservas",
               href: "/resident/reservations",
               icon: "event_note",
+              active: activeTab === "reservations",
               variant: "fab",
               tone: "gold",
               hideLabel: true,

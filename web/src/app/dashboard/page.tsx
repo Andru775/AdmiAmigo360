@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { AppViewport } from "@/components/app/AppViewport";
+import { BottomNav } from "@/components/app/BottomNav";
 import { GlassCard } from "@/components/app/GlassCard";
 import { Icon } from "@/components/app/Icon";
 import { RoleGate } from "@/components/app/RoleGate";
 import { SceneArt } from "@/components/app/SceneArt";
-import { StitchTabBar } from "@/components/app/StitchTabBar";
 import { adminBarSeries, adminQuickActions, adminTasks, adminSummary } from "@/data/demoDb";
 import { fetchPaymentsOverview, summarizeMonthlyCollection, type PaymentsOverview } from "@/lib/app-data";
 
@@ -313,15 +313,7 @@ function DashboardContent() {
           </section>
         </main>
 
-        <StitchTabBar
-          items={[
-            { label: "Panel", href: "/dashboard", icon: "dashboard", active: true },
-            { label: "Residentes", href: "/residents", icon: "apartment" },
-            { label: "Nuevo", href: "/residents/new", icon: "person_add", variant: "fab", tone: "gold" },
-            { label: "Pagos", href: "/payments", icon: "payments" },
-            { label: "Cuenta", href: "/settings", icon: "settings" },
-          ]}
-        />
+        <BottomNav current="dashboard" />
       </div>
     </AppViewport>
   );
