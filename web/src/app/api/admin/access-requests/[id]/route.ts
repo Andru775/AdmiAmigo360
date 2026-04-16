@@ -56,13 +56,21 @@ export async function PATCH(
     const apartment = String(unit.unit_code ?? "Apartamento");
 
     if (action === "reject") {
+      const rejectionEmail = await sendAccessRequestRejectedEmail(email, fullName);
+
+      if (!rejectionEmail.sent) {
+        const message = rejectionEmail.skipped
+          ? "Falta configurar correo transaccional para rechazar y avisar por email."
+          : "No fue posible enviar el correo de rechazo. Intenta nuevamente.";
+
+        return NextResponse.json({ error: message }, { status: 503 });
+      }
+
       const deleteResult = await adminClient.from("residents").delete().eq("id", resident.id);
 
       if (deleteResult.error) {
         return NextResponse.json({ error: "No fue posible rechazar la solicitud." }, { status: 500 });
       }
-
-      const rejectionEmail = await sendAccessRequestRejectedEmail(email, fullName);
 
       await adminClient.from("operations").insert({
         property_id: requestContext.profile.property_id,
@@ -75,9 +83,7 @@ export async function PATCH(
 
       return NextResponse.json({
         reviewed: true,
-        message: rejectionEmail.sent
-          ? "Solicitud rechazada. Enviamos la notificación al correo del residente."
-          : "Solicitud rechazada. Falta configurar correo transaccional para avisar por email.",
+        message: "Solicitud rechazada. Enviamos la notificación al correo del residente.",
       });
     }
 
