@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
+import { AppMenu, residentMenuItems } from "@/components/app/AppMenu";
 import { AppViewport } from "@/components/app/AppViewport";
 import { Icon } from "@/components/app/Icon";
 import { StitchTabBar } from "@/components/app/StitchTabBar";
@@ -25,25 +26,28 @@ export function ResidentShell({
   return (
     <AppViewport>
       <div className="flex min-h-0 flex-1 flex-col">
-        <header className="border-b border-[var(--app-card-border)] bg-[rgba(253,251,248,0.96)] px-5 pb-4 pt-6">
+        <header className="border-b border-[var(--app-card-border)] bg-[rgba(253,251,248,0.96)] px-5 pb-4 pt-5">
           <div className="flex items-center justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <p className="app-kicker">Portal residente</p>
               <h1 className="app-display mt-2 text-[1.4rem] font-[680] text-[var(--app-heading)]">
                 {title}
               </h1>
               <p className="mt-1 text-[0.92rem] leading-6 text-[var(--app-muted)]">{subtitle}</p>
             </div>
-            <Link
-              href={actionHref}
-              className="flex h-12 w-12 items-center justify-center rounded-[1rem] border border-[var(--app-card-border)] bg-white text-[var(--app-heading)] shadow-[0_10px_18px_rgba(93,64,55,0.05)]"
-            >
-              <Icon name={actionIcon} className="text-[1.2rem]" />
-            </Link>
+            <div className="flex shrink-0 items-center gap-2">
+              <AppMenu items={residentMenuItems} />
+              <Link
+                href={actionHref}
+                className="flex h-12 w-12 items-center justify-center rounded-[1rem] border border-[var(--app-card-border)] bg-white text-[var(--app-heading)] shadow-[0_10px_18px_rgba(93,64,55,0.05)]"
+              >
+                <Icon name={actionIcon} className="text-[1.2rem]" />
+              </Link>
+            </div>
           </div>
         </header>
 
-        <main className="app-scroll flex-1 overflow-y-auto px-4 pb-8 pt-6">{children}</main>
+        <main className="app-scroll flex-1 overflow-y-auto px-4 pb-8 pt-5">{children}</main>
 
         <StitchTabBar
           items={[

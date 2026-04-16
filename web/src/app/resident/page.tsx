@@ -60,13 +60,9 @@ function ResidentHomeContent() {
           <div className="mt-5 flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="app-kicker">Resumen residente</p>
-              <h2 className="app-display mt-2 text-[1.8rem] font-[680] leading-[1.02] text-[var(--app-heading)]">
-                Todo lo que te concierne en una sola vista
+              <h2 className="app-display mt-2 text-[1.55rem] font-[680] leading-[1.04] text-[var(--app-heading)]">
+                Tu vivienda
               </h2>
-              <p className="mt-3 text-[0.94rem] leading-6 text-[var(--app-muted)]">
-                Asambleas, avisos, reservas y tu estado de cuenta sin mezclar información
-                privada de administración.
-              </p>
             </div>
 
             <div className="rounded-[1.1rem] border border-[var(--app-card-border)] bg-[var(--app-surface-soft)] px-3 py-2 text-right">

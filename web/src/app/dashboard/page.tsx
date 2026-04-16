@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { adminMenuItems, AppMenu } from "@/components/app/AppMenu";
 import { AppViewport } from "@/components/app/AppViewport";
 import { BottomNav } from "@/components/app/BottomNav";
 import { GlassCard } from "@/components/app/GlassCard";
@@ -60,37 +61,35 @@ function DashboardContent() {
               <h1 className="app-display mt-2 text-[1.95rem] font-[680] leading-none text-[var(--app-heading)]">
                 Panel principal
               </h1>
-              <p className="mt-3 max-w-[18rem] text-[0.95rem] leading-6 text-[var(--app-muted)]">
-                Resumen ejecutivo del conjunto con cartera, residentes activos y seguimientos
-                prioritarios.
+              <p className="mt-3 max-w-[16rem] text-[0.95rem] leading-6 text-[var(--app-muted)]">
+                Cartera, residentes y alertas al día.
               </p>
             </div>
 
-            <Link
-              href="/access-requests"
-              className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.15rem] border border-[var(--app-card-border)] bg-white text-[var(--app-heading)] shadow-[0_10px_22px_rgba(93,64,55,0.06)]"
-            >
-              <Icon name="notifications" className="text-[1.2rem]" />
-              <span className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full bg-[var(--app-secondary)]" />
-            </Link>
+            <div className="flex shrink-0 items-center gap-2">
+              <AppMenu items={adminMenuItems} />
+              <Link
+                href="/access-requests"
+                className="relative flex h-12 w-12 items-center justify-center rounded-[1.15rem] border border-[var(--app-card-border)] bg-white text-[var(--app-heading)] shadow-[0_10px_22px_rgba(93,64,55,0.06)]"
+              >
+                <Icon name="notifications" className="text-[1.2rem]" />
+                <span className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full bg-[var(--app-secondary)]" />
+              </Link>
+            </div>
           </div>
         </header>
 
-        <main className="app-scroll flex-1 overflow-y-auto px-4 pb-24 pt-6">
+        <main className="app-scroll flex-1 overflow-y-auto px-4 pb-8 pt-5">
           <GlassCard className="overflow-hidden rounded-[2rem] p-4">
             <div className="app-figure overflow-hidden rounded-[1.6rem] border">
-              <SceneArt variant="estate" className="h-[12rem] w-full" />
+              <SceneArt variant="estate" className="h-[10.5rem] w-full" />
             </div>
 
             <div className="mt-5">
               <p className="app-kicker">Resumen ejecutivo</p>
-              <h2 className="app-display mt-2 text-[1.85rem] font-[680] leading-[1.02] text-[var(--app-heading)]">
-                Administración residencial con lectura clara y elegante
+              <h2 className="app-display mt-2 text-[1.65rem] font-[680] leading-[1.04] text-[var(--app-heading)]">
+                Resumen del conjunto
               </h2>
-              <p className="mt-3 text-[0.94rem] leading-6 text-[var(--app-muted)]">
-                Todo el panorama del conjunto en una sola pantalla mobile-first, con foco en
-                recaudo, ocupación y acciones reales del día.
-              </p>
             </div>
 
             <div className="mt-5 grid grid-cols-2 gap-3">
@@ -106,9 +105,6 @@ function DashboardContent() {
                 <p className="mt-4 text-[1.9rem] font-semibold tracking-tight text-[var(--app-heading)]">
                   {summary.monthlyCollection}
                 </p>
-                <p className="mt-2 text-[0.85rem] text-[var(--app-muted)]">
-                  Consolidado del mes actual.
-                </p>
               </div>
 
               <div className="rounded-[1.35rem] border border-[var(--app-card-border)] bg-[var(--app-surface-soft)] p-4">
@@ -123,21 +119,6 @@ function DashboardContent() {
                 <p className="mt-4 text-[1.9rem] font-semibold tracking-tight text-[var(--app-heading)]">
                   {summary.activeUnits}
                 </p>
-                <p className="mt-2 text-[0.85rem] text-[var(--app-muted)]">
-                  Directorio activo del conjunto.
-                </p>
-              </div>
-            </div>
-
-            <div className="app-horizontal no-scrollbar mt-5 flex gap-2 overflow-x-auto pb-1">
-              <div className="shrink-0 rounded-full border border-[var(--app-card-border)] bg-white px-4 py-2 text-[0.78rem] font-semibold text-[var(--app-heading)]">
-                {summary.overdueCount} requieren seguimiento
-              </div>
-              <div className="shrink-0 rounded-full border border-[var(--app-card-border)] bg-white px-4 py-2 text-[0.78rem] font-semibold text-[var(--app-heading)]">
-                {summary.activeUnits} con lectura en tiempo real
-              </div>
-              <div className="shrink-0 rounded-full border border-[var(--app-card-border)] bg-white px-4 py-2 text-[0.78rem] font-semibold text-[var(--app-heading)]">
-                Navegación optimizada para celular
               </div>
             </div>
 
@@ -166,9 +147,6 @@ function DashboardContent() {
                 <h3 className="app-display mt-2 text-[1.55rem] font-[680] text-[var(--app-heading)]">
                   Curva de recaudo
                 </h3>
-                <p className="mt-2 text-[0.9rem] leading-6 text-[var(--app-muted)]">
-                  Lectura compacta del comportamiento financiero del semestre.
-                </p>
               </div>
               <div className="app-figure overflow-hidden rounded-[1.25rem] border p-2">
                 <SceneArt variant="finance" className="h-[4.8rem] w-[5.8rem]" />
@@ -285,7 +263,7 @@ function DashboardContent() {
 
           <section className="mt-6 pb-2">
             <div className="mb-4">
-              <p className="app-kicker">Quick Access</p>
+              <p className="app-kicker">Atajos</p>
               <h3 className="app-display mt-2 text-[1.35rem] font-[680] text-[var(--app-heading)]">
                 Atajos operativos
               </h3>
@@ -303,9 +281,6 @@ function DashboardContent() {
                   </div>
                   <p className="mt-4 text-[1rem] font-semibold text-[var(--app-heading)]">
                     {action.label}
-                  </p>
-                  <p className="mt-2 text-[0.86rem] leading-6 text-[var(--app-muted)]">
-                    Abrir módulo relacionado con {action.label.toLowerCase()}.
                   </p>
                 </Link>
               ))}

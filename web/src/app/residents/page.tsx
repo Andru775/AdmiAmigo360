@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { adminMenuItems, AppMenu } from "@/components/app/AppMenu";
 import { AppViewport } from "@/components/app/AppViewport";
 import { BottomNav } from "@/components/app/BottomNav";
 import { GlassCard } from "@/components/app/GlassCard";
@@ -162,13 +163,13 @@ function ResidentsContent() {
               <h1 className="app-display mt-2 text-[1.9rem] font-[680] leading-none text-[var(--app-heading)]">
                 Residentes
               </h1>
-              <p className="mt-3 max-w-[18rem] text-[0.94rem] leading-6 text-[var(--app-muted)]">
-                Directorio organizado para encontrar, contactar y dar seguimiento a cada
-                apartamento del conjunto.
+              <p className="mt-3 max-w-[16rem] text-[0.94rem] leading-6 text-[var(--app-muted)]">
+                Apartamentos, contactos y cartera.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <AppMenu items={adminMenuItems} />
               <Link
                 href="/notifications"
                 className="relative flex h-12 w-12 items-center justify-center rounded-[1.15rem] border border-[var(--app-card-border)] bg-white text-[var(--app-heading)] shadow-[0_10px_22px_rgba(93,64,55,0.06)]"
@@ -176,31 +177,21 @@ function ResidentsContent() {
                 <Icon name="notifications" className="text-[1.16rem]" />
                 <span className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full bg-[var(--app-secondary)]" />
               </Link>
-              <Link
-                href="/residents/new"
-                className="flex h-12 w-12 items-center justify-center rounded-[1.15rem] border border-[var(--app-card-border)] bg-[var(--app-primary)] text-white shadow-[0_10px_22px_rgba(93,64,55,0.14)]"
-              >
-                <Icon name="person_add" className="text-[1.08rem]" />
-              </Link>
             </div>
           </div>
         </header>
 
-        <main className="app-scroll flex-1 overflow-y-auto px-4 pb-24 pt-6">
+        <main className="app-scroll flex-1 overflow-y-auto px-4 pb-8 pt-5">
           <GlassCard className="overflow-hidden rounded-[2rem] p-4">
             <div className="app-figure overflow-hidden rounded-[1.6rem] border">
-              <SceneArt variant="concierge" className="h-[12rem] w-full" />
+              <SceneArt variant="concierge" className="h-[10.5rem] w-full" />
             </div>
 
             <div className="mt-5">
               <p className="app-kicker">Vista de cartera</p>
-              <h2 className="app-display mt-2 text-[1.8rem] font-[680] leading-[1.02] text-[var(--app-heading)]">
-                Relación clara entre apartamentos, residentes y estado de cartera
+              <h2 className="app-display mt-2 text-[1.55rem] font-[680] leading-[1.04] text-[var(--app-heading)]">
+                Apartamentos y residentes
               </h2>
-              <p className="mt-3 text-[0.94rem] leading-6 text-[var(--app-muted)]">
-                La información se organiza por apartamentos y mantiene visible lo importante sin
-                que las etiquetas ni los textos se salgan de su espacio.
-              </p>
             </div>
 
             <div className="mt-5 grid grid-cols-3 gap-2">

@@ -107,6 +107,16 @@ input::placeholder {
   background: rgba(141, 110, 99, 0.42);
 }
 
+.app-shell-frame {
+  padding-top: env(safe-area-inset-top);
+}
+
+@media (min-width: 640px) {
+  .app-shell-frame {
+    padding-top: 0;
+  }
+}
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -187,11 +197,13 @@ input::placeholder {
   position: sticky;
   bottom: 0;
   z-index: 40;
+  padding-top: 0.65rem;
+  padding-bottom: max(env(safe-area-inset-bottom), 0.55rem);
   box-shadow: 0 -10px 24px rgba(71, 51, 41, 0.06);
 }
 
 .app-tabbar-link {
-  min-height: 4rem;
+  min-height: 3.55rem;
   color: var(--app-primary);
 }
 

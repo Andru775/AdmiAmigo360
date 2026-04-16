@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { adminMenuItems, AppMenu } from "@/components/app/AppMenu";
 import { AppViewport } from "@/components/app/AppViewport";
 import { BottomNav } from "@/components/app/BottomNav";
 import { GlassCard } from "@/components/app/GlassCard";
@@ -44,25 +45,27 @@ function PaymentsContent() {
               <h1 className="app-display mt-2 text-[1.9rem] font-[680] leading-none text-[var(--app-heading)]">
                 Pagos y cartera
               </h1>
-              <p className="mt-3 max-w-[18rem] text-[0.95rem] leading-6 text-[var(--app-muted)]">
-                Recaudo del mes, unidades en seguimiento y movimientos recientes desde una
-                lectura apta para celular.
+              <p className="mt-3 max-w-[16rem] text-[0.95rem] leading-6 text-[var(--app-muted)]">
+                Recaudo, mora y movimientos.
               </p>
             </div>
 
-            <Link
-              href="/payments/reminders"
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.15rem] border border-[var(--app-card-border)] bg-white text-[var(--app-heading)] shadow-[0_10px_22px_rgba(93,64,55,0.06)]"
-            >
-              <Icon name="notifications" className="text-[1.15rem]" />
-            </Link>
+            <div className="flex shrink-0 items-center gap-2">
+              <AppMenu items={adminMenuItems} />
+              <Link
+                href="/payments/reminders"
+                className="flex h-12 w-12 items-center justify-center rounded-[1.15rem] border border-[var(--app-card-border)] bg-white text-[var(--app-heading)] shadow-[0_10px_22px_rgba(93,64,55,0.06)]"
+              >
+                <Icon name="notifications" className="text-[1.15rem]" />
+              </Link>
+            </div>
           </div>
         </header>
 
-        <main className="app-scroll flex-1 overflow-y-auto px-4 pb-24 pt-6">
+        <main className="app-scroll flex-1 overflow-y-auto px-4 pb-8 pt-5">
           <GlassCard className="overflow-hidden rounded-[2rem] p-4">
             <div className="app-figure overflow-hidden rounded-[1.6rem] border">
-              <SceneArt variant="finance" className="h-[12rem] w-full" />
+              <SceneArt variant="finance" className="h-[10.5rem] w-full" />
             </div>
 
             <div className="mt-5 flex items-start justify-between gap-4">
@@ -71,10 +74,6 @@ function PaymentsContent() {
                 <h2 className="app-display mt-2 text-[1.85rem] font-[680] leading-[1.02] text-[var(--app-heading)]">
                   {overview ? summarizeMonthlyCollection(overview.monthlyCollectionFull) : "$45.2k"}
                 </h2>
-                <p className="mt-2 text-[0.92rem] leading-6 text-[var(--app-muted)]">
-                  Flujo operativo para registrar recaudo, enviar recordatorios y revisar el
-                  historial más reciente.
-                </p>
               </div>
               <div className="rounded-full bg-[var(--app-success-bg)] px-3 py-2 text-[0.78rem] font-semibold text-[var(--app-success)]">
                 +12% mes

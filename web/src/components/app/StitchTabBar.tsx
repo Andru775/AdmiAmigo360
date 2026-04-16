@@ -18,7 +18,7 @@ type StitchTabBarProps = {
 
 export function StitchTabBar({ items }: StitchTabBarProps) {
   return (
-    <nav className="app-tabbar shrink-0 border-t border-[var(--app-card-border)] bg-[rgba(253,251,248,0.98)] px-3 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">
+    <nav className="app-tabbar shrink-0 border-t border-[var(--app-card-border)] bg-[rgba(253,251,248,0.98)] px-3">
       <div className="grid grid-cols-5 items-end gap-1">
         {items.map((item) => {
           if (item.variant === "fab") {
@@ -33,7 +33,7 @@ export function StitchTabBar({ items }: StitchTabBarProps) {
                   href={item.href}
                   aria-label={item.label}
                   aria-current={item.active ? "page" : undefined}
-                  className={`app-tabbar-fab flex h-[4.1rem] w-[4.1rem] items-center justify-center rounded-full border-4 border-[var(--app-shell)] ${fabTone}`}
+                  className={`app-tabbar-fab flex h-[3.85rem] w-[3.85rem] items-center justify-center rounded-full border-4 border-[var(--app-shell)] ${fabTone}`}
                 >
                   <Icon name={item.icon} className="text-[1.75rem]" />
                 </Link>
