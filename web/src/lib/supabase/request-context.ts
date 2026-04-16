@@ -1,12 +1,18 @@
 import type { User } from "@supabase/supabase-js";
 
+import {
+  ensureAccountRole,
+  isAppRole,
+  loadAccountRoles,
+  type AppRole,
+} from "@/lib/supabase/account-roles";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getRequestSupabaseUser } from "@/lib/supabase/request-user";
 
 export type RequestProfile = {
   id: string;
   property_id: string;
-  role: "admin" | "resident";
+  role: AppRole;
   full_name: string;
   title: string | null;
 };
@@ -58,7 +64,56 @@ function collectVerifiedUserEmails(user: User) {
   return [...emails];
 }
 
-async function resolveResidentProfileFromVerifiedEmail(user: User) {
+function selectEffectiveRole(
+  roles: AppRole[],
+  preferredRole?: AppRole,
+  fallbackRole?: AppRole,
+) {
+  const activeRoles = new Set(roles);
+
+  if (preferredRole) {
+    return activeRoles.has(preferredRole) ? preferredRole : null;
+  }
+
+  if (fallbackRole && activeRoles.has(fallbackRole)) {
+    return fallbackRole;
+  }
+
+  if (activeRoles.has("admin")) {
+    return "admin";
+  }
+
+  if (activeRoles.has("resident")) {
+    return "resident";
+  }
+
+  return null;
+}
+
+async function resolveRolesForProfile(
+  adminClient: ReturnType<typeof getSupabaseAdminClient>,
+  profile: RequestProfile,
+  preferredRole?: AppRole,
+) {
+  const rolesResult = await loadAccountRoles(adminClient, profile.id, profile.property_id);
+
+  if (!rolesResult.ready || rolesResult.error) {
+    return preferredRole && preferredRole !== profile.role ? null : profile.role;
+  }
+
+  const hasRoleRecords = rolesResult.rows.length > 0;
+  const activeRoles = rolesResult.rows
+    .filter((row) => row.status === "active")
+    .map((row) => row.role);
+
+  if (!hasRoleRecords) {
+    activeRoles.push(profile.role);
+  }
+
+  return selectEffectiveRole(activeRoles, preferredRole, profile.role);
+}
+
+async function resolveResidentProfileFromVerifiedEmail(user: User, preferredRole?: AppRole) {
   const emails = collectVerifiedUserEmails(user);
 
   if (!emails.length) {
@@ -85,20 +140,33 @@ async function resolveResidentProfileFromVerifiedEmail(user: User) {
   >;
   const unitCode = typeof unit.unit_code === "string" ? unit.unit_code : "";
 
-  const { data: existingProfile } = await adminClient
+  const { data: residentProfile } = await adminClient
     .from("profiles")
     .select("title")
     .eq("id", existingProfileId)
     .maybeSingle();
 
+  const { data: currentProfile } = await adminClient
+    .from("profiles")
+    .select("role, full_name, title, phone")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const currentRole = isAppRole(currentProfile?.role) ? currentProfile.role : "resident";
+  const effectiveRole = preferredRole === "admin" ? null : "resident";
+
+  if (!effectiveRole) {
+    return null;
+  }
+
   const profile: RequestProfile = {
     id: user.id,
     property_id: String(resident.property_id),
-    role: "resident",
+    role: effectiveRole,
     full_name: String(resident.full_name ?? "Residente"),
     title:
-      typeof existingProfile?.title === "string" && existingProfile.title
-        ? existingProfile.title
+      typeof residentProfile?.title === "string" && residentProfile.title
+        ? residentProfile.title
         : unitCode
           ? `Residente ${unitCode}`
           : "Residente del conjunto",
@@ -106,7 +174,11 @@ async function resolveResidentProfileFromVerifiedEmail(user: User) {
 
   const profileUpsert = await adminClient.from("profiles").upsert(
     {
-      ...profile,
+      id: user.id,
+      property_id: profile.property_id,
+      role: currentRole,
+      full_name: profile.full_name,
+      title: currentRole === "admin" && currentProfile?.title ? currentProfile.title : profile.title,
       phone: String(resident.phone ?? ""),
     },
     { onConflict: "id" },
@@ -127,10 +199,19 @@ async function resolveResidentProfileFromVerifiedEmail(user: User) {
     }
   }
 
+  await ensureAccountRole(adminClient, {
+    user_id: user.id,
+    property_id: profile.property_id,
+    role: "resident",
+  });
+
   return profile;
 }
 
-export async function getRequestContext(request: Request): Promise<RequestContext | null> {
+export async function getRequestContext(
+  request: Request,
+  preferredRole?: AppRole,
+): Promise<RequestContext | null> {
   const user = await getRequestSupabaseUser(request);
 
   if (!user?.id) {
@@ -149,13 +230,23 @@ export async function getRequestContext(request: Request): Promise<RequestContex
   }
 
   if (profile) {
+    const typedProfile = profile as RequestProfile;
+    const role = await resolveRolesForProfile(adminClient, typedProfile, preferredRole);
+
+    if (!role) {
+      return null;
+    }
+
     return {
       user,
-      profile: profile as RequestProfile,
+      profile: {
+        ...typedProfile,
+        role,
+      },
     };
   }
 
-  const linkedProfile = await resolveResidentProfileFromVerifiedEmail(user);
+  const linkedProfile = await resolveResidentProfileFromVerifiedEmail(user, preferredRole);
 
   if (!linkedProfile) {
     return null;

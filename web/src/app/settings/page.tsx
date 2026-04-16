@@ -14,7 +14,7 @@ function SettingsContent() {
       header={
         <HeaderBar
           title="Configuración"
-          subtitle="Reglas del demo, automatizaciones activas y salida segura de sesión."
+          subtitle="Reglas operativas, accesos administrativos y salida segura de sesión."
           icon="settings"
           action={
             <Link
@@ -40,6 +40,24 @@ function SettingsContent() {
             </div>
           </GlassCard>
         ))}
+
+        <Link
+          href="/admin-users"
+          className="flex items-center justify-between gap-4 rounded-[1.2rem] border border-[var(--app-card-border)] bg-white px-5 py-4 text-[var(--app-heading)] shadow-[0_12px_28px_rgba(93,64,55,0.08)]"
+        >
+          <span className="flex min-w-0 items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[var(--app-surface-soft)] text-[var(--app-primary)]">
+              <Icon name="admin_panel_settings" className="text-[1.15rem]" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[0.98rem] font-semibold">Administradores</span>
+              <span className="mt-1 block text-[0.82rem] leading-5 text-[var(--app-muted)]">
+                Crear, activar o revocar accesos administrativos.
+              </span>
+            </span>
+          </span>
+          <Icon name="chevron_right" className="shrink-0 text-[1.2rem] text-[var(--app-muted)]" />
+        </Link>
 
         <Link
           href="/logout"

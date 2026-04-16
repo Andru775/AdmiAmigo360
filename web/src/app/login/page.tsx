@@ -250,12 +250,14 @@ export default function LoginPage() {
                   <span className="text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
                     Contraseña
                   </span>
-                  <Link
-                    href="/support?tab=password"
-                    className="text-[0.85rem] font-semibold text-[var(--app-primary)]"
-                  >
-                    Recuperar acceso
-                  </Link>
+                  {role === "resident" ? (
+                    <Link
+                      href="/support?tab=password"
+                      className="text-[0.85rem] font-semibold text-[var(--app-primary)]"
+                    >
+                      Recuperar acceso
+                    </Link>
+                  ) : null}
                 </div>
                 <div className="app-input flex h-[3.9rem] items-center gap-3 rounded-[1rem] px-4">
                   <Icon name="lock" className="text-[1.15rem] text-[var(--app-muted)]" />

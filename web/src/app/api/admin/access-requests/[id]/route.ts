@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { ensureAccountRole, isAppRole } from "@/lib/supabase/account-roles";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendPasswordResetEmail } from "@/lib/supabase/auth-emails";
 import { getRequestContext } from "@/lib/supabase/request-context";
@@ -14,7 +15,7 @@ export async function PATCH(
 ) {
   try {
     const { id } = await context.params;
-    const requestContext = await getRequestContext(request);
+    const requestContext = await getRequestContext(request, "admin");
 
     if (!requestContext) {
       return NextResponse.json({ error: "Debes iniciar sesión como administrador." }, { status: 401 });
@@ -107,27 +108,24 @@ export async function PATCH(
 
     const existingProfile = await adminClient
       .from("profiles")
-      .select("role")
+      .select("role, title")
       .eq("id", authUserId)
       .maybeSingle();
 
-    if (existingProfile.data?.role === "admin") {
-      return NextResponse.json(
-        {
-          error:
-            "Ese correo ya tiene un perfil administrativo. La doble función admin/residente requiere gestión de roles.",
-        },
-        { status: 409 },
-      );
-    }
+    const currentRole = isAppRole(existingProfile.data?.role)
+      ? existingProfile.data.role
+      : "resident";
 
     const profileUpsert = await adminClient.from("profiles").upsert(
       {
         id: authUserId,
         property_id: requestContext.profile.property_id,
-        role: "resident",
+        role: currentRole,
         full_name: fullName,
-        title: `Residente ${apartment}`,
+        title:
+          currentRole === "admin" && existingProfile.data?.title
+            ? existingProfile.data.title
+            : `Residente ${apartment}`,
         phone: String(resident.phone ?? ""),
       },
       { onConflict: "id" },
@@ -135,6 +133,17 @@ export async function PATCH(
 
     if (profileUpsert.error) {
       return NextResponse.json({ error: "No fue posible crear el perfil del residente." }, { status: 500 });
+    }
+
+    const residentRole = await ensureAccountRole(adminClient, {
+      user_id: authUserId,
+      property_id: requestContext.profile.property_id,
+      role: "resident",
+      granted_by: requestContext.user.id,
+    });
+
+    if (residentRole.error) {
+      return NextResponse.json({ error: "No fue posible activar el rol de residente." }, { status: 500 });
     }
 
     const residentUpdate = await adminClient

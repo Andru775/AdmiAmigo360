@@ -6,6 +6,7 @@ import {
   authenticateDemoUser,
   clearSession,
   getDefaultAccount,
+  readSession,
   storeSession,
   type SessionUser,
 } from "@/lib/demoAuth";
@@ -13,6 +14,43 @@ import { getSupabaseAccessToken, getSupabaseBrowserClient } from "@/lib/supabase
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export type ResidentOAuthProvider = "google" | "azure";
+
+const PREFERRED_ROLE_KEY = "admiamigo360.preferred-role";
+
+function isDemoRole(value: unknown): value is DemoRole {
+  return value === "admin" || value === "resident";
+}
+
+function readPreferredRole() {
+  if (typeof window === "undefined") {
+    return undefined;
+  }
+
+  const storedRole = window.localStorage.getItem(PREFERRED_ROLE_KEY);
+  const sessionRole = readSession()?.role;
+
+  if (isDemoRole(storedRole)) {
+    return storedRole;
+  }
+
+  return isDemoRole(sessionRole) ? sessionRole : undefined;
+}
+
+function storePreferredRole(role: DemoRole) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(PREFERRED_ROLE_KEY, role);
+}
+
+function clearPreferredRole() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(PREFERRED_ROLE_KEY);
+}
 
 function getPasswordLoginMessage(message: string) {
   const normalized = message.toLowerCase();
@@ -28,15 +66,17 @@ function getPasswordLoginMessage(message: string) {
   return "No fue posible iniciar sesión. Revisa los datos e intenta nuevamente.";
 }
 
-async function buildSupabaseSession() {
+async function buildSupabaseSession(role?: DemoRole) {
   const token = await getSupabaseAccessToken();
   const headers = new Headers();
+  const preferredRole = role ?? readPreferredRole();
 
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch("/api/session", {
+  const params = preferredRole ? `?role=${preferredRole}` : "";
+  const response = await fetch(`/api/session${params}`, {
     method: "GET",
     headers,
     credentials: "include",
@@ -54,15 +94,16 @@ async function buildSupabaseSession() {
   }
 
   storeSession(session);
+  clearPreferredRole();
   return session;
 }
 
-export async function resolveSupabaseSession() {
+export async function resolveSupabaseSession(role?: DemoRole) {
   if (!getSupabaseBrowserClient()) {
     return null;
   }
 
-  const session = await buildSupabaseSession();
+  const session = await buildSupabaseSession(role);
 
   if (!session) {
     clearSession();
@@ -75,6 +116,7 @@ export async function resolveSupabaseSession() {
 export async function loginWithPassword(role: DemoRole, email: string, password: string) {
   const normalizedEmail = email.trim().toLowerCase();
   const normalizedPassword = password.trim();
+  storePreferredRole(role);
 
   if (!normalizedEmail || !normalizedPassword) {
     return {
@@ -118,7 +160,7 @@ export async function loginWithPassword(role: DemoRole, email: string, password:
     };
   }
 
-  const session = await resolveSupabaseSession();
+  const session = await resolveSupabaseSession(role);
 
   if (!session) {
     await supabase.auth.signOut();
@@ -167,6 +209,7 @@ export async function loginWithOAuth(provider: ResidentOAuthProvider) {
 
   const redirectTo = `${window.location.origin}/auth/callback?next=/login&oauth=1`;
   const scopes = provider === "azure" ? "email" : undefined;
+  storePreferredRole("resident");
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
@@ -188,6 +231,7 @@ export async function logoutApp() {
     await supabase?.auth.signOut();
   }
 
+  clearPreferredRole();
   clearAppDataCache();
   clearSession();
 }

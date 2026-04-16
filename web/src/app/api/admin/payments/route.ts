@@ -1,41 +1,21 @@
 import { NextResponse } from "next/server";
 
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { getRequestSupabaseUser } from "@/lib/supabase/request-user";
+import { getRequestContext } from "@/lib/supabase/request-context";
 
 export async function POST(request: Request) {
   try {
-    const supabase = await getSupabaseServerClient();
+    const context = await getRequestContext(request, "admin");
 
-    if (!supabase) {
-      return NextResponse.json(
-        {
-          error:
-            "Supabase no está configurado. Agrega NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY.",
-        },
-        { status: 503 },
-      );
-    }
-
-    const user = await getRequestSupabaseUser(request);
-
-    if (!user?.id) {
+    if (!context) {
       return NextResponse.json({ error: "Debes iniciar sesión como administrador." }, { status: 401 });
     }
 
-    const adminClient = getSupabaseAdminClient();
-
-    const { data: profile } = await adminClient
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (!profile || profile.role !== "admin") {
+    if (context.profile.role !== "admin") {
       return NextResponse.json({ error: "Solo un administrador puede registrar pagos." }, { status: 403 });
     }
 
+    const adminClient = getSupabaseAdminClient();
     const body = (await request.json()) as Record<string, unknown>;
     const residentId = String(body.residentId ?? "").trim();
     const amount = Number(body.amount ?? 0);
@@ -76,7 +56,7 @@ export async function POST(request: Request) {
         paid_at: new Date().toISOString(),
         payment_method: paymentMethod,
         note,
-        created_by: user.id,
+        created_by: context.user.id,
       })
       .select("id")
       .single();

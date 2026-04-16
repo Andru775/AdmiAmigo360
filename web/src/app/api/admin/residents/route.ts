@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { ensureAccountRole, isAppRole } from "@/lib/supabase/account-roles";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendPasswordResetEmail } from "@/lib/supabase/auth-emails";
 import { getRequestContext } from "@/lib/supabase/request-context";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { getRequestSupabaseUser } from "@/lib/supabase/request-user";
 
 function residentSlugFromUnit(tower: string, unitCode: string, email: string) {
   return `${tower}-${unitCode}-${email}`.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -12,7 +11,7 @@ function residentSlugFromUnit(tower: string, unitCode: string, email: string) {
 
 export async function GET(request: Request) {
   try {
-    const context = await getRequestContext(request);
+    const context = await getRequestContext(request, "admin");
 
     if (!context) {
       return NextResponse.json({ error: "Debes iniciar sesión como administrador." }, { status: 401 });
@@ -49,36 +48,17 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const supabase = await getSupabaseServerClient();
+    const context = await getRequestContext(request, "admin");
 
-    if (!supabase) {
-      return NextResponse.json(
-        {
-          error:
-            "Supabase no está configurado. Agrega NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY.",
-        },
-        { status: 503 },
-      );
-    }
-
-    const user = await getRequestSupabaseUser(request);
-
-    if (!user?.id) {
+    if (!context) {
       return NextResponse.json({ error: "Debes iniciar sesión como administrador." }, { status: 401 });
     }
 
-    const adminClient = getSupabaseAdminClient();
-
-    const { data: profile } = await adminClient
-      .from("profiles")
-      .select("role, property_id")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (!profile || profile.role !== "admin") {
+    if (context.profile.role !== "admin") {
       return NextResponse.json({ error: "Solo un administrador puede crear residentes." }, { status: 403 });
     }
 
+    const adminClient = getSupabaseAdminClient();
     const body = (await request.json()) as Record<string, unknown>;
     const fullName = String(body.fullName ?? "").trim();
     const email = String(body.email ?? "").trim().toLowerCase();
@@ -99,7 +79,7 @@ export async function POST(request: Request) {
       .from("units")
       .upsert(
         {
-          property_id: profile.property_id,
+          property_id: context.profile.property_id,
           tower,
           level_label: levelLabel,
           unit_code: unitCode,
@@ -151,7 +131,7 @@ export async function POST(request: Request) {
       .upsert(
         {
           profile_id: authUserId,
-          property_id: profile.property_id,
+          property_id: context.profile.property_id,
           unit_id: unitUpsert.data.id,
           slug: residentSlugFromUnit(tower, unitCode, email),
           full_name: fullName,
@@ -161,7 +141,7 @@ export async function POST(request: Request) {
           status: balance > 0 ? "overdue" : "paid",
           balance,
           notes,
-          created_by: user.id,
+          created_by: context.user.id,
         },
         { onConflict: "email" },
       )
@@ -180,13 +160,26 @@ export async function POST(request: Request) {
       );
     }
 
+    const existingProfile = await adminClient
+      .from("profiles")
+      .select("role, title")
+      .eq("id", authUserId)
+      .maybeSingle();
+
+    const currentRole = isAppRole(existingProfile.data?.role)
+      ? existingProfile.data.role
+      : "resident";
+
     const profileUpsert = await adminClient.from("profiles").upsert(
       {
         id: authUserId,
-        property_id: profile.property_id,
-        role: "resident",
+        property_id: context.profile.property_id,
+        role: currentRole,
         full_name: fullName,
-        title: `Residente ${unitCode}`,
+        title:
+          currentRole === "admin" && existingProfile.data?.title
+            ? existingProfile.data.title
+            : `Residente ${unitCode}`,
         phone,
       },
       { onConflict: "id" },
@@ -194,6 +187,17 @@ export async function POST(request: Request) {
 
     if (profileUpsert.error) {
       return NextResponse.json({ error: "No fue posible guardar el perfil de acceso." }, { status: 500 });
+    }
+
+    const residentRole = await ensureAccountRole(adminClient, {
+      user_id: authUserId,
+      property_id: context.profile.property_id,
+      role: "resident",
+      granted_by: context.user.id,
+    });
+
+    if (residentRole.error) {
+      return NextResponse.json({ error: "No fue posible activar el rol de residente." }, { status: 500 });
     }
 
     let activationEmailSent = false;

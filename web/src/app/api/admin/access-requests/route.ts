@@ -5,7 +5,7 @@ import { getRequestContext } from "@/lib/supabase/request-context";
 
 export async function GET(request: Request) {
   try {
-    const context = await getRequestContext(request);
+    const context = await getRequestContext(request, "admin");
 
     if (!context) {
       return NextResponse.json({ error: "Debes iniciar sesión como administrador." }, { status: 401 });

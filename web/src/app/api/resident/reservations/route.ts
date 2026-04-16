@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const context = await getRequestContext(request);
+    const context = await getRequestContext(request, "resident");
 
     if (!context) {
       return NextResponse.json({ error: "Debes iniciar sesión como residente." }, { status: 401 });

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { hasActiveAccountRole, isAppRole } from "@/lib/supabase/account-roles";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendPasswordResetEmail } from "@/lib/supabase/auth-emails";
 
@@ -23,11 +24,20 @@ export async function POST(request: Request) {
     if (user?.id) {
       const profileResult = await adminClient
         .from("profiles")
-        .select("role")
+        .select("role, property_id")
         .eq("id", user.id)
         .maybeSingle();
 
-      if (profileResult.data?.role === "admin") {
+      const profileRole = isAppRole(profileResult.data?.role) ? profileResult.data.role : undefined;
+      const propertyId =
+        typeof profileResult.data?.property_id === "string"
+          ? profileResult.data.property_id
+          : "";
+      const isActiveAdmin = propertyId
+        ? await hasActiveAccountRole(adminClient, user.id, propertyId, "admin", profileRole)
+        : false;
+
+      if (isActiveAdmin) {
         const redirectTo = `${new URL(request.url).origin}/reset-password`;
         await sendPasswordResetEmail(email, redirectTo);
       }

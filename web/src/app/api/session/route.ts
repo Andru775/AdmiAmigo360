@@ -6,9 +6,14 @@ function resolveHomeHref(role: "admin" | "resident") {
   return role === "admin" ? "/dashboard" : "/resident";
 }
 
+function resolveRequestedRole(request: Request) {
+  const role = new URL(request.url).searchParams.get("role");
+  return role === "admin" || role === "resident" ? role : undefined;
+}
+
 export async function GET(request: Request) {
   try {
-    const context = await getRequestContext(request);
+    const context = await getRequestContext(request, resolveRequestedRole(request));
 
     if (!context) {
       return NextResponse.json({ error: "No hay sesión activa." }, { status: 401 });

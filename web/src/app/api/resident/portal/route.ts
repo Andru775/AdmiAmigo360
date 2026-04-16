@@ -5,7 +5,7 @@ import { getRequestContext } from "@/lib/supabase/request-context";
 
 export async function GET(request: Request) {
   try {
-    const context = await getRequestContext(request);
+    const context = await getRequestContext(request, "resident");
 
     if (!context) {
       return NextResponse.json({ error: "Debes iniciar sesión como residente." }, { status: 401 });
