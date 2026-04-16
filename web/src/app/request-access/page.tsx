@@ -7,16 +7,15 @@ import { AppScreen } from "@/components/app/AppScreen";
 import { GlassCard } from "@/components/app/GlassCard";
 import { HeaderBar } from "@/components/app/HeaderBar";
 import { Icon } from "@/components/app/Icon";
-
-const towerOptions = ["Torre A", "Torre B", "Torre C", "Torre D"] as const;
-const countryOptions = [
-  { code: "+57", label: "Colombia" },
-  { code: "+1", label: "Estados Unidos" },
-  { code: "+52", label: "México" },
-  { code: "+51", label: "Perú" },
-  { code: "+56", label: "Chile" },
-  { code: "+34", label: "España" },
-] as const;
+import {
+  buildInternationalPhone,
+  countryOptions,
+  getCountryOption,
+  onlyDigits,
+  towerOptions,
+  validateEmailFormat,
+  validateNationalPhone,
+} from "@/lib/contact-validation";
 
 type ApiResult = {
   requested?: boolean;
@@ -65,7 +64,11 @@ export default function RequestAccessPage() {
   }
 
   function updateDigitsField(field: "phone" | "apartmentCode", value: string) {
-    updateRequestField(field, value.replace(/\D/g, ""));
+    const digits = onlyDigits(value);
+    const maxLength =
+      field === "phone" ? getCountryOption(requestForm.phoneCountry).digits : 6;
+
+    updateRequestField(field, digits.slice(0, maxLength));
   }
 
   async function handleAccessRequest(event: React.FormEvent<HTMLFormElement>) {
@@ -74,6 +77,20 @@ export default function RequestAccessPage() {
     setRequestResult(null);
 
     try {
+      const emailValidation = validateEmailFormat(requestForm.email);
+      const phoneValidation = validateNationalPhone(
+        requestForm.phoneCountry,
+        requestForm.phone,
+      );
+
+      if (!emailValidation.isValid) {
+        throw new Error(emailValidation.error);
+      }
+
+      if (!phoneValidation.isValid) {
+        throw new Error(phoneValidation.error);
+      }
+
       const response = await fetch("/api/auth/access-request", {
         method: "POST",
         headers: {
@@ -81,8 +98,9 @@ export default function RequestAccessPage() {
         },
         body: JSON.stringify({
           ...requestForm,
+          email: emailValidation.email,
           apartmentCode: requestForm.apartmentCode,
-          phone: `${requestForm.phoneCountry}${requestForm.phone}`,
+          phone: buildInternationalPhone(requestForm.phoneCountry, requestForm.phone),
           propertyCode: "admiamigo-360",
         }),
       });
@@ -104,6 +122,8 @@ export default function RequestAccessPage() {
       setRequestLoading(false);
     }
   }
+
+  const selectedCountry = getCountryOption(requestForm.phoneCountry);
 
   return (
     <AppScreen
@@ -164,7 +184,7 @@ export default function RequestAccessPage() {
                 value={requestForm.email}
                 onChange={(event) => updateRequestField("email", event.target.value)}
                 className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                placeholder="tu-correo@ejemplo.com"
+                placeholder="nombre@gmail.com"
               />
             </label>
 
@@ -175,7 +195,14 @@ export default function RequestAccessPage() {
               <div className="grid grid-cols-[7.8rem_1fr] gap-2">
                 <select
                   value={requestForm.phoneCountry}
-                  onChange={(event) => updateRequestField("phoneCountry", event.target.value)}
+                  onChange={(event) => {
+                    const nextCountry = getCountryOption(event.target.value);
+                    setRequestForm((current) => ({
+                      ...current,
+                      phoneCountry: nextCountry.code,
+                      phone: current.phone.slice(0, nextCountry.digits),
+                    }));
+                  }}
                   className="app-input h-[3.8rem] w-full rounded-[1rem] px-3 text-[0.9rem] outline-none"
                   aria-label="Indicativo del país"
                 >
@@ -190,10 +217,14 @@ export default function RequestAccessPage() {
                   inputMode="numeric"
                   value={requestForm.phone}
                   onChange={(event) => updateDigitsField("phone", event.target.value)}
+                  maxLength={selectedCountry.digits}
                   className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                  placeholder="3000000000"
+                  placeholder={selectedCountry.placeholder}
                 />
               </div>
+              <p className="mt-2 text-[0.78rem] leading-5 text-[var(--app-muted)]">
+                {selectedCountry.label}: {selectedCountry.digits} dígitos.
+              </p>
             </label>
           </div>
 
@@ -224,6 +255,7 @@ export default function RequestAccessPage() {
                 inputMode="numeric"
                 value={requestForm.apartmentCode}
                 onChange={(event) => updateDigitsField("apartmentCode", event.target.value)}
+                maxLength={6}
                 className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
                 placeholder="402"
               />

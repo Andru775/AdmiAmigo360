@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
 
+import { validateInternationalPhone } from "@/lib/contact-validation";
 import { ensureAccountRole, isAppRole } from "@/lib/supabase/account-roles";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendAccountActivationEmail } from "@/lib/supabase/auth-emails";
+import { validateEmailCanReceiveMail } from "@/lib/supabase/email-domain";
 import { getRequestContext } from "@/lib/supabase/request-context";
 
-function residentSlugFromUnit(tower: string, unitCode: string, email: string) {
-  return `${tower}-${unitCode}-${email}`.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
-}
-
-function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
+export const runtime = "nodejs";
 
 function normalizePhone(value: string) {
   const trimmed = value.trim();
@@ -27,8 +23,8 @@ function normalizePhone(value: string) {
   return `+${trimmed.slice(1).replace(/\D/g, "")}`;
 }
 
-function isValidInternationalPhone(value: string) {
-  return !value || /^\+[1-9]\d{7,14}$/.test(value);
+function residentSlugFromUnit(tower: string, unitCode: string, email: string) {
+  return `${tower}-${unitCode}-${email}`.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
 
 export async function GET(request: Request) {
@@ -95,21 +91,25 @@ export async function POST(request: Request) {
     const password = String(body.password ?? "").trim();
     const balance = Number(body.balance ?? 0);
 
-    if (!fullName || !email || !tower || !levelLabel || !unitCode) {
-      return NextResponse.json({ error: "Completa nombre, correo, torre y apartamento." }, { status: 400 });
+    if (!fullName || !email || !phone || !tower || !levelLabel || !unitCode) {
+      return NextResponse.json({ error: "Completa nombre, correo, teléfono, torre y apartamento." }, { status: 400 });
     }
 
-    if (!isValidEmail(email)) {
-      return NextResponse.json({ error: "Ingresa un correo electrónico válido." }, { status: 400 });
+    const emailValidation = await validateEmailCanReceiveMail(email);
+
+    if (!emailValidation.isValid) {
+      return NextResponse.json({ error: emailValidation.error }, { status: 400 });
     }
 
     if (!/^\d{1,6}$/.test(rawUnitCode) || !/^\d{1,6}$/.test(unitCode)) {
       return NextResponse.json({ error: "El apartamento debe contener solo números." }, { status: 400 });
     }
 
-    if (/[a-z]/i.test(rawPhone) || !isValidInternationalPhone(phone)) {
+    const phoneValidation = validateInternationalPhone(phone);
+
+    if (!/^\+\d+$/.test(rawPhone) || !phoneValidation.isValid) {
       return NextResponse.json(
-        { error: "Ingresa un teléfono válido con indicativo de país." },
+        { error: phoneValidation.error },
         { status: 400 },
       );
     }

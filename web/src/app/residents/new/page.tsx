@@ -10,15 +10,15 @@ import { Icon } from "@/components/app/Icon";
 import { SceneArt } from "@/components/app/SceneArt";
 import { RoleGate } from "@/components/app/RoleGate";
 import { createResident } from "@/lib/app-data";
-
-const countryOptions = [
-  { code: "+57", label: "Colombia" },
-  { code: "+1", label: "Estados Unidos" },
-  { code: "+52", label: "México" },
-  { code: "+51", label: "Perú" },
-  { code: "+56", label: "Chile" },
-  { code: "+34", label: "España" },
-] as const;
+import {
+  buildInternationalPhone,
+  countryOptions,
+  getCountryOption,
+  onlyDigits,
+  towerOptions,
+  validateEmailFormat,
+  validateNationalPhone,
+} from "@/lib/contact-validation";
 
 const initialState = {
   fullName: "",
@@ -50,7 +50,10 @@ function NewResidentContent() {
   }
 
   function updateDigitsField(field: "phone" | "unitCode", value: string) {
-    updateField(field, value.replace(/\D/g, ""));
+    const digits = onlyDigits(value);
+    const maxLength = field === "phone" ? getCountryOption(form.phoneCountry).digits : 6;
+
+    updateField(field, digits.slice(0, maxLength));
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -60,10 +63,21 @@ function NewResidentContent() {
     setSuccess(null);
 
     try {
+      const emailValidation = validateEmailFormat(form.email);
+      const phoneValidation = validateNationalPhone(form.phoneCountry, form.phone);
+
+      if (!emailValidation.isValid) {
+        throw new Error(emailValidation.error);
+      }
+
+      if (!phoneValidation.isValid) {
+        throw new Error(phoneValidation.error);
+      }
+
       const result = await createResident({
         fullName: form.fullName,
-        email: form.email,
-        phone: form.phone ? `${form.phoneCountry}${form.phone}` : "",
+        email: emailValidation.email,
+        phone: buildInternationalPhone(form.phoneCountry, form.phone),
         tower: form.tower,
         levelLabel: form.unitCode ? `Apartamento ${form.unitCode}` : form.levelLabel,
         unitCode: form.unitCode,
@@ -90,6 +104,8 @@ function NewResidentContent() {
     }
   }
 
+  const selectedCountry = getCountryOption(form.phoneCountry);
+
   return (
     <AppScreen
       currentNav="residents"
@@ -115,13 +131,13 @@ function NewResidentContent() {
         </div>
 
         <div className="mt-5">
-          <p className="app-kicker">Resident Onboarding</p>
+          <p className="app-kicker">Nuevo residente</p>
           <h2 className="app-display mt-2 text-[1.7rem] font-[680] leading-[1.02] text-[var(--app-heading)]">
             Crea el residente y su acceso desde una sola pantalla
           </h2>
           <p className="mt-3 text-[0.94rem] leading-6 text-[var(--app-muted)]">
-            Está pantalla queda enlazada a la ruta administrativa interna. Cuando Supabase está
-            configurado, crea unidad, residente, perfil y cuenta de acceso.
+            Registra los mismos datos que solicitaría un residente, pero con aprobación directa de
+            administración.
           </p>
         </div>
 
@@ -148,7 +164,7 @@ function NewResidentContent() {
                 value={form.email}
                 onChange={(event) => updateField("email", event.target.value)}
                 className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                placeholder="correo@residente.com"
+                placeholder="nombre@gmail.com"
               />
             </label>
 
@@ -159,7 +175,14 @@ function NewResidentContent() {
               <div className="grid grid-cols-[7.8rem_1fr] gap-2">
                 <select
                   value={form.phoneCountry}
-                  onChange={(event) => updateField("phoneCountry", event.target.value)}
+                  onChange={(event) => {
+                    const nextCountry = getCountryOption(event.target.value);
+                    setForm((current) => ({
+                      ...current,
+                      phoneCountry: nextCountry.code,
+                      phone: current.phone.slice(0, nextCountry.digits),
+                    }));
+                  }}
                   className="app-input h-[3.8rem] w-full rounded-[1rem] px-3 text-[0.9rem] outline-none"
                   aria-label="Indicativo del país"
                 >
@@ -174,10 +197,14 @@ function NewResidentContent() {
                   inputMode="numeric"
                   value={form.phone}
                   onChange={(event) => updateDigitsField("phone", event.target.value)}
+                  maxLength={selectedCountry.digits}
                   className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-                  placeholder="3000000000"
+                  placeholder={selectedCountry.placeholder}
                 />
               </div>
+              <p className="mt-2 text-[0.78rem] leading-5 text-[var(--app-muted)]">
+                {selectedCountry.label}: {selectedCountry.digits} dígitos.
+              </p>
             </label>
           </div>
 
@@ -185,12 +212,17 @@ function NewResidentContent() {
             <span className="mb-2 block text-[0.74rem] font-semibold uppercase tracking-[0.18em] text-[var(--app-muted)]">
               Torre
             </span>
-            <input
+            <select
               value={form.tower}
               onChange={(event) => updateField("tower", event.target.value)}
               className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
-              placeholder="Torre A"
-            />
+            >
+              {towerOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
           </label>
 
           <div className="grid grid-cols-2 gap-3">
@@ -203,6 +235,7 @@ function NewResidentContent() {
                 inputMode="numeric"
                 value={form.unitCode}
                 onChange={(event) => updateDigitsField("unitCode", event.target.value)}
+                maxLength={6}
                 className="app-input h-[3.8rem] w-full rounded-[1rem] px-4 outline-none"
                 placeholder="402"
               />
@@ -278,7 +311,7 @@ function NewResidentContent() {
               Residente creado correctamente.
               {success.activationEmailSent ? (
                 <p className="mt-2 font-semibold">
-                  Se envio un correo para que el residente configure su acceso.
+                  Se envió un correo para que el residente configure su acceso.
                 </p>
               ) : null}
               {success.temporaryPassword ? (

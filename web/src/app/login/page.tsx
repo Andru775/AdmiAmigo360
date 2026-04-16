@@ -378,16 +378,18 @@ export default function LoginPage() {
             )}
           </section>
 
-          <p className="mt-7 text-center text-[0.95rem] leading-6 text-[var(--app-muted)]">
-            Si no recuerdas tu usuario o tu contraseña,{" "}
-            <Link
-              href="/support?tab=account"
-              className="font-semibold text-[var(--app-primary)]"
-            >
-              usa la recuperación segura
-            </Link>
-            .
-          </p>
+          {role === "resident" ? (
+            <p className="mt-7 text-center text-[0.95rem] leading-6 text-[var(--app-muted)]">
+              Si no recuerdas tu usuario o tu contraseña,{" "}
+              <Link
+                href="/support?tab=account"
+                className="font-semibold text-[var(--app-primary)]"
+              >
+                usa la recuperación segura
+              </Link>
+              .
+            </p>
+          ) : null}
         </div>
       </main>
     </AppViewport>

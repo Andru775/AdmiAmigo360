@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
+import { validateInternationalPhone } from "@/lib/contact-validation";
+import { validateEmailCanReceiveMail } from "@/lib/supabase/email-domain";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+
+export const runtime = "nodejs";
 
 function normalizeTower(value: string) {
   const cleaned = value.trim().replace(/\s+/g, " ").toLowerCase();
@@ -28,10 +32,6 @@ function buildResidentSlug(tower: string, unitCode: string, email: string) {
     .replace(/[^a-z0-9]+/g, "-");
 }
 
-function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
 function normalizePhone(value: string) {
   const trimmed = value.trim();
 
@@ -40,10 +40,6 @@ function normalizePhone(value: string) {
   }
 
   return `+${trimmed.slice(1).replace(/\D/g, "")}`;
-}
-
-function isValidInternationalPhone(value: string) {
-  return /^\+[1-9]\d{7,14}$/.test(value);
 }
 
 function buildRequestNotes(
@@ -92,9 +88,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!isValidEmail(email)) {
+    const emailValidation = await validateEmailCanReceiveMail(email);
+
+    if (!emailValidation.isValid) {
       return NextResponse.json(
-        { error: "Ingresa un correo electrónico válido." },
+        { error: emailValidation.error },
         { status: 400 },
       );
     }
@@ -106,9 +104,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (/[a-z]/i.test(rawPhone) || !isValidInternationalPhone(phone)) {
+    const phoneValidation = validateInternationalPhone(phone);
+
+    if (!/^\+\d+$/.test(rawPhone) || !phoneValidation.isValid) {
       return NextResponse.json(
-        { error: "Ingresa un teléfono válido con indicativo de país." },
+        { error: phoneValidation.error },
         { status: 400 },
       );
     }
