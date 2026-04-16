@@ -15,7 +15,97 @@ function createAuthClient() {
   });
 }
 
-export async function sendPasswordResetEmail(email: string, redirectTo: string) {
+type PasswordResetEmailOptions = {
+  fullName?: string;
+  accountType?: "resident" | "admin";
+};
+
+type PasswordResetEmailResult = {
+  error: Error | null;
+  usedCustomEmail: boolean;
+};
+
+export async function sendPasswordResetEmail(
+  email: string,
+  redirectTo: string,
+  options: PasswordResetEmailOptions = {},
+): Promise<PasswordResetEmailResult> {
+  const smtpConfig = getSmtpEmailConfig();
+  const resendConfig = getResendEmailConfig();
+
+  if (!smtpConfig.isConfigured && !resendConfig.isConfigured) {
+    const client = createAuthClient();
+    const fallback = await client.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    });
+
+    return {
+      error: fallback.error
+        ? fallback.error instanceof Error
+          ? fallback.error
+          : new Error("No fue posible enviar el correo de recuperación.")
+        : null,
+      usedCustomEmail: false,
+    };
+  }
+
+  const adminClient = getSupabaseAdminClient();
+  const linkResult = await adminClient.auth.admin.generateLink({
+    type: "recovery",
+    email,
+    options: {
+      redirectTo,
+    },
+  });
+
+  const actionLink = linkResult.data.properties?.action_link;
+
+  if (linkResult.error || !actionLink) {
+    return {
+      error:
+        linkResult.error ?? new Error("No fue posible generar el enlace de recuperación."),
+      usedCustomEmail: false,
+    };
+  }
+
+  const fullName = options.fullName?.trim() || "usuario";
+  const accountLabel =
+    options.accountType === "admin" ? "cuenta administrativa" : "cuenta";
+  const safeName = escapeHtml(fullName);
+  const safeLink = escapeHtml(actionLink);
+  const html = emailShell(`
+    <h1 style="margin:0; color:#2b211c; font-size:26px;">Restablece tu contraseña</h1>
+    <p style="color:#6f625b; font-size:16px; line-height:1.6;">
+      Hola ${safeName}, recibimos una solicitud para cambiar la contraseña de tu ${accountLabel} en AdmiAmigo 360.
+    </p>
+    <p style="color:#6f625b; font-size:16px; line-height:1.6;">
+      Usa este enlace seguro para definir una nueva contraseña:
+    </p>
+    <a href="${safeLink}" style="display:block; text-align:center; background:#5d4037; color:#ffffff; text-decoration:none; border-radius:16px; padding:16px 20px; font-weight:700;">
+      Restablecer contraseña
+    </a>
+    <p style="color:#8a7a70; font-size:13px; line-height:1.5; margin-top:18px;">
+      Si no solicitaste este cambio, ignora este correo. Tu acceso seguirá protegido mientras no abras el enlace.
+    </p>
+  `);
+
+  const emailResult = await sendTransactionalEmail({
+    to: email,
+    subject:
+      options.accountType === "admin"
+        ? "Recupera tu acceso administrativo"
+        : "Restablece tu contraseña de AdmiAmigo 360",
+    html,
+    text: `Hola ${fullName}, recibimos una solicitud para cambiar la contraseña de tu ${accountLabel} en AdmiAmigo 360. Restablécela aquí: ${actionLink}`,
+  });
+
+  return {
+    error: emailResult.error,
+    usedCustomEmail: emailResult.sent,
+  };
+}
+
+export async function sendNativeSupabasePasswordResetEmail(email: string, redirectTo: string) {
   const client = createAuthClient();
 
   return client.auth.resetPasswordForEmail(email, {
@@ -197,7 +287,7 @@ export async function sendAccountActivationEmail(
   const resendConfig = getResendEmailConfig();
 
   if (!smtpConfig.isConfigured && !resendConfig.isConfigured) {
-    const fallback = await sendPasswordResetEmail(email, redirectTo);
+    const fallback = await sendNativeSupabasePasswordResetEmail(email, redirectTo);
     return {
       sent: !fallback.error,
       customEmailSent: false,

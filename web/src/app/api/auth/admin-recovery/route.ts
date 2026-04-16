@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     if (user?.id) {
       const profileResult = await adminClient
         .from("profiles")
-        .select("role, property_id")
+        .select("role, property_id, full_name")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -39,7 +39,20 @@ export async function POST(request: Request) {
 
       if (isActiveAdmin) {
         const redirectTo = `${new URL(request.url).origin}/reset-password`;
-        await sendPasswordResetEmail(email, redirectTo);
+        const resetResult = await sendPasswordResetEmail(email, redirectTo, {
+          fullName:
+            typeof profileResult.data?.full_name === "string"
+              ? profileResult.data.full_name
+              : undefined,
+          accountType: "admin",
+        });
+
+        if (resetResult.error) {
+          return NextResponse.json(
+            { error: "No fue posible enviar el correo de recuperación. Intenta nuevamente." },
+            { status: 500 },
+          );
+        }
       }
     }
 

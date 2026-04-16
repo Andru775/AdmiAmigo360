@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AppScreen } from "@/components/app/AppScreen";
 import { GlassCard } from "@/components/app/GlassCard";
 import { HeaderBar } from "@/components/app/HeaderBar";
 import { Icon } from "@/components/app/Icon";
-import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 const tabs = [
   { id: "password", label: "Contraseña" },
@@ -28,7 +26,6 @@ type ApiResult = {
 };
 
 export default function SupportPage() {
-  const usingSupabase = isSupabaseConfigured();
   const [activeTab, setActiveTab] = useState<SupportTab>("password");
 
   const [email, setEmail] = useState("");
@@ -42,14 +39,6 @@ export default function SupportPage() {
   const [phone, setPhone] = useState("");
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupResult, setLookupResult] = useState<ApiResult | null>(null);
-
-  const redirectTo = useMemo(() => {
-    if (typeof window === "undefined") {
-      return "";
-    }
-
-    return `${window.location.origin}/reset-password`;
-  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -81,38 +70,27 @@ export default function SupportPage() {
     setPasswordMessage("");
 
     try {
-      if (!usingSupabase) {
-        throw new Error("La recuperación por correo se activa cuando Supabase está configurado.");
-      }
-
       const normalizedEmail = email.trim().toLowerCase();
       if (!normalizedEmail.includes("@")) {
         throw new Error("Ingresa un correo válido para continuar.");
       }
 
-      const supabase = getSupabaseBrowserClient();
-      if (!supabase) {
-        throw new Error("No fue posible inicializar Supabase en este dispositivo.");
-      }
-
-      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo,
+      const response = await fetch("/api/auth/password-recovery", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: normalizedEmail,
+        }),
       });
+      const result = (await response.json()) as ApiResult;
 
-      if (error) {
-        if (error.message.toLowerCase().includes("rate limit")) {
-          setPasswordMessage(
-            "Ya solicitamos un enlace hace poco. Revisa tu correo o espera unos minutos antes de pedir otro.",
-          );
-          return;
-        }
-
-        throw new Error(error.message);
+      if (!response.ok) {
+        throw new Error(result.error ?? "No fue posible iniciar la recuperación.");
       }
 
-      setPasswordMessage(
-        "Si existe una cuenta con ese correo, enviamos un enlace para cambiar la contraseña.",
-      );
+      setPasswordMessage(result.message ?? "Si existe una cuenta con ese correo, enviamos un enlace para cambiar la contraseña.");
     } catch (error) {
       setPasswordError(
         error instanceof Error
