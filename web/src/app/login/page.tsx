@@ -41,6 +41,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [recovered, setRecovered] = useState(false);
+  const [created, setCreated] = useState(false);
   const [oauthSubmitting, setOauthSubmitting] = useState<ResidentOAuthProvider | null>(null);
   const usingSupabase = isSupabaseConfigured();
 
@@ -57,10 +58,12 @@ export default function LoginPage() {
 
     const params = new URLSearchParams(window.location.search);
     const recoveredFlag = params.get("recovered") === "1";
+    const createdFlag = params.get("created") === "1";
     const oauthError = params.get("oauth_error");
 
     const timer = window.setTimeout(() => {
       setRecovered(recoveredFlag);
+      setCreated(createdFlag);
 
       if (oauthError) {
         setError(
@@ -297,6 +300,12 @@ export default function LoginPage() {
               {recovered ? (
                 <div className="rounded-[1rem] border border-[rgba(86,114,96,0.18)] bg-[var(--app-success-bg)] px-4 py-3 text-[0.9rem] text-[var(--app-success)]">
                   Tu contraseña ya fue actualizada. Ingresa con la nueva clave.
+                </div>
+              ) : null}
+
+              {created ? (
+                <div className="rounded-[1rem] border border-[rgba(86,114,96,0.18)] bg-[var(--app-success-bg)] px-4 py-3 text-[0.9rem] text-[var(--app-success)]">
+                  Tu contraseña fue creada. Ingresa con tu correo y la nueva clave.
                 </div>
               ) : null}
             </form>

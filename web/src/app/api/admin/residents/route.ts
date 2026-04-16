@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { ensureAccountRole, isAppRole } from "@/lib/supabase/account-roles";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendPasswordResetEmail } from "@/lib/supabase/auth-emails";
+import { sendAccountActivationEmail } from "@/lib/supabase/auth-emails";
 import { getRequestContext } from "@/lib/supabase/request-context";
 
 function residentSlugFromUnit(tower: string, unitCode: string, email: string) {
@@ -203,8 +203,8 @@ export async function POST(request: Request) {
     let activationEmailSent = false;
 
     if (shouldSendActivationEmail) {
-      const redirectTo = `${new URL(request.url).origin}/reset-password`;
-      const { error: emailError } = await sendPasswordResetEmail(email, redirectTo);
+      const redirectTo = `${new URL(request.url).origin}/create-password`;
+      const { error: emailError } = await sendAccountActivationEmail(email, fullName, redirectTo);
 
       if (!emailError) {
         activationEmailSent = true;

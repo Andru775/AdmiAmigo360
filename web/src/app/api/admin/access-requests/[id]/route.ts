@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 
 import { ensureAccountRole, isAppRole } from "@/lib/supabase/account-roles";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendPasswordResetEmail } from "@/lib/supabase/auth-emails";
+import {
+  sendAccessRequestRejectedEmail,
+  sendAccountActivationEmail,
+} from "@/lib/supabase/auth-emails";
 import { getRequestContext } from "@/lib/supabase/request-context";
 
 function makeTemporaryPassword() {
@@ -59,6 +62,8 @@ export async function PATCH(
         return NextResponse.json({ error: "No fue posible rechazar la solicitud." }, { status: 500 });
       }
 
+      const rejectionEmail = await sendAccessRequestRejectedEmail(email, fullName);
+
       await adminClient.from("operations").insert({
         property_id: requestContext.profile.property_id,
         title: "Solicitud rechazada",
@@ -68,7 +73,12 @@ export async function PATCH(
         status: "closed",
       });
 
-      return NextResponse.json({ reviewed: true, message: "Solicitud rechazada." });
+      return NextResponse.json({
+        reviewed: true,
+        message: rejectionEmail.sent
+          ? "Solicitud rechazada. Enviamos la notificación al correo del residente."
+          : "Solicitud rechazada. Falta configurar correo transaccional para avisar por email.",
+      });
     }
 
     if (action !== "approve") {
@@ -159,8 +169,8 @@ export async function PATCH(
       return NextResponse.json({ error: "No fue posible activar el residente." }, { status: 500 });
     }
 
-    const redirectTo = `${new URL(request.url).origin}/reset-password`;
-    const activationEmail = await sendPasswordResetEmail(email, redirectTo);
+    const redirectTo = `${new URL(request.url).origin}/create-password`;
+    const activationEmail = await sendAccountActivationEmail(email, fullName, redirectTo);
 
     await adminClient.from("operations").insert({
       property_id: requestContext.profile.property_id,
@@ -174,8 +184,10 @@ export async function PATCH(
     return NextResponse.json({
       reviewed: true,
       message: activationEmail.error
-        ? "Solicitud aprobada. El residente ya puede intentar recuperar contraseña si no recibió el correo."
-        : "Solicitud aprobada. Enviamos un enlace de activación al residente.",
+        ? "Solicitud aprobada. No fue posible enviar el correo de activación."
+        : activationEmail.customEmailSent
+          ? "Solicitud aprobada. Enviamos el correo para crear contraseña."
+          : "Solicitud aprobada. Enviamos un enlace de activación al residente.",
     });
   } catch (error) {
     return NextResponse.json(

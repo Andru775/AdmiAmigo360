@@ -7,7 +7,7 @@ import {
   loadAccountRoles,
 } from "@/lib/supabase/account-roles";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendPasswordResetEmail } from "@/lib/supabase/auth-emails";
+import { sendAccountActivationEmail } from "@/lib/supabase/auth-emails";
 import { getRequestContext } from "@/lib/supabase/request-context";
 
 function makeTemporaryPassword() {
@@ -228,8 +228,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No fue posible activar el rol de administrador." }, { status: 500 });
     }
 
-    const redirectTo = `${new URL(request.url).origin}/reset-password`;
-    const activationEmail = await sendPasswordResetEmail(email, redirectTo);
+    const redirectTo = `${new URL(request.url).origin}/create-password`;
+    const activationEmail = await sendAccountActivationEmail(email, fullName, redirectTo);
 
     await adminClient.from("operations").insert({
       property_id: context.profile.property_id,
@@ -250,8 +250,10 @@ export async function POST(request: Request) {
       },
       activationEmailSent: !activationEmail.error,
       message: activationEmail.error
-        ? "El acceso fue creado. Si el correo no recibe enlace, usa recuperación administrativa."
-        : "El acceso fue creado y se envió un enlace para definir contraseña.",
+        ? "El acceso fue creado. No fue posible enviar el correo de activación."
+        : activationEmail.customEmailSent
+          ? "El acceso fue creado y se envió el correo para crear contraseña."
+          : "El acceso fue creado y se envió un enlace para definir contraseña.",
     });
   } catch (error) {
     return NextResponse.json(
